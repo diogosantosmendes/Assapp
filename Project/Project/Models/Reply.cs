@@ -10,11 +10,11 @@ namespace Project.Models
     public class Reply
     {
         [Key]
-        public string ID { get; set; }
+        public int ID { get; set; }
 
         public DateTime Hour { get; set; }
 
-        public string Content { get; set; }
+        public String Content { get; set; }
 
         //*********************************************************************************************
         //*********************    Foreign Keys definition      ***************************************
@@ -26,7 +26,7 @@ namespace Project.Models
 
         public ApplicationUser User { get; set; } // associates in C# the USER with the REPLY
         [ForeignKey("User")]
-        public int UserFK { get; set; } // associates in SQL the USER with the REPLY
+        public String UserFK { get; set; } // associates in SQL the USER with the REPLY
 
         //*********************   END Foreign Keys definition    *************************************
         //********************************************************************************************

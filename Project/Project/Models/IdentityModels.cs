@@ -59,12 +59,12 @@ namespace Project.Models
          *  DbSet<Vote> Vote                -> representa uma tabela da base de dados (neste caso chamada 'Vote') com a classe Vote
          **************************************************************************************************************************/
         public virtual DbSet<Action> Action { get; set; }
-        public virtual DbSet<Event> Event { get; set; }
-        public virtual DbSet<Option> Option { get; set; }
-        public virtual DbSet<Poll> Poll { get; set; }
         public virtual DbSet<Publication> Publication { get; set; }
+        public virtual DbSet<Event> Event { get; set; }
+        public virtual DbSet<Poll> Poll { get; set; }
         public virtual DbSet<Reply> Reply { get; set; }
         public virtual DbSet<Type> Type { get; set; }
+        public virtual DbSet<Option> Option { get; set; }
         public virtual DbSet<Vote> Vote { get; set; }
         //************************************************************************************************************************
 

@@ -9,24 +9,24 @@ namespace Project.Models
 {
     public class Event
     {
+        public Event()
+        {
+            Publications = new HashSet<Publication>();
+        }
+
         [Key]
-        public string ID { get; set; }
+        public int ID { get; set; }
 
         public DateTime Day { get; set; }
 
-        public string Local { get; set; }
+        public String Local { get; set; }
 
         public Boolean Accepted { get; set; }
 
-        //*********************************************************************************************
-        //*********************    Foreign Keys definition      ***************************************
-        //*********************************************************************************************
-
-        public Publication Publication { get; set; } // associates in C# the EVENT with the PUBLICATION
-        [ForeignKey("Publication")]
-        public int PublicationFK { get; set; } // associates in SQL the EVENT with the PUBLICATION
-
-        //*********************   END Foreign Keys definition    *************************************
-        //********************************************************************************************
+        //***************************************************************************
+        //* Refers to the relationship between EVENT and the PUBLICATION
+        //* A EVENT may have multiple PUBLICATION   
+        public ICollection<Publication> Publications { get; set; }
+        //***************************************************************************
     }
 }

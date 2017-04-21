@@ -16,7 +16,7 @@ namespace Project.Models
         }
 
         [Key]
-        public String ID { get; set; }
+        public int ID { get; set; }
 
         public String Name { get; set; }
 
@@ -34,7 +34,15 @@ namespace Project.Models
 
         public ApplicationUser User { get; set; } // associates in C# the USER with the PUBLICATION
         [ForeignKey("User")]
-        public int UserFK { get; set; } // associates in SQL the USER with the PUBLICATION
+        public String UserFK { get; set; } // associates in SQL the USER with the PUBLICATION
+
+        public Poll Poll { get; set; } // associates in C# the PUBLICATION with the POLL
+        [ForeignKey("Poll")]
+        public int PollFK { get; set; } // associates in SQL the PUBLICATION with the POLL
+
+        public Event Event { get; set; } // associates in C# the PUBLICATION with the EVENT
+        [ForeignKey("Event")]
+        public int EventFK { get; set; } // associates in SQL the PUBLICATION with the EVENT
 
         //*********************   END Foreign Keys definition    **********************************
         //*****************************************************************************************
@@ -44,16 +52,5 @@ namespace Project.Models
         //* A EVENT may have multiple REPLY   
         public ICollection<Reply> Replies { get; set; }
         //***************************************************************************
-
-        //***************************************************************************
-        //* Refers to the relationship between PUBLICATION and the EVENT
-        //* A PUBLICATION may have only a EVENT 
-        public virtual Event Event { get; set; }
-        //* Refers to the relationship between PUBLICATION and the POLL
-        //* A EVENT may have only a POLL
-        public virtual Poll Poll { get; set; }
-        //**************************************************************************
-
-
     }
 }

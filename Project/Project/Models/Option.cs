@@ -16,7 +16,7 @@ namespace Project.Models
         }
 
         [Key]
-        public String ID { get; set; }
+        public int ID { get; set; }
 
         public String Name { get; set; }
 
