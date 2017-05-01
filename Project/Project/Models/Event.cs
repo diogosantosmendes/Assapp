@@ -21,8 +21,6 @@ namespace Project.Models
 
         public String Local { get; set; }
 
-        public Boolean Accepted { get; set; }
-
         //***************************************************************************
         //* Refers to the relationship between EVENT and the PUBLICATION
         //* A EVENT may have multiple PUBLICATION   

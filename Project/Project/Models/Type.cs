@@ -11,7 +11,7 @@ namespace Project.Models
         // Construtor
         public Type()
         {
-            Options = new HashSet<Option>();
+            Polls = new HashSet<Poll>();
         }
 
         [Key]
@@ -22,7 +22,7 @@ namespace Project.Models
         //***************************************************************************
         //* Refers to the relationship between TYPE and the OPTION
         //* A TYPE may have multiple OPTION   
-        public ICollection<Option> Options { get; set; }
+        public ICollection<Poll> Polls { get; set; }
         //***************************************************************************
     }
 }

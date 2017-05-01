@@ -14,6 +14,7 @@ namespace Project.Models
         {
             Votes = new HashSet<Vote>();
             Publications = new HashSet<Publication>();
+            Options = new HashSet<Option>();
         }
 
         [Key]
@@ -28,6 +29,9 @@ namespace Project.Models
         //* Refers to the relationship between POOL and the PUBLICATION
         //* A POLL may have multiple PUBLICATION   
         public ICollection<Publication> Publications { get; set; }
+        //* Refers to the relationship between POOL and the PUBLICATION
+        //* Many POLLS may have multiple OPTIONS
+        public ICollection<Option> Options { get; set; }
         //***************************************************************************
     }
 }

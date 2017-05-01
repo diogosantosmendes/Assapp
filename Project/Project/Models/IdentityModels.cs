@@ -4,15 +4,26 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System;
 
 namespace Project.Models
 {
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit https://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public class ApplicationUser : IdentityUser
     {
-
         // *****************************************************************
         // User data required for this system
+        
+        //Constructor
+        public ApplicationUser()
+        {
+            Replies = new HashSet<Reply>();
+            Votes = new HashSet<Vote>();
+            Publications = new HashSet<Publication>();
+            Actions = new HashSet<Action>();
+        }
+
         [Display(Name = "Name")]
         public string Name { get; set; }
         
@@ -21,8 +32,27 @@ namespace Project.Models
         
         [Display(Name = "Phone")]
         public string Phone { get; set; }
-        //********************************************************************
+
+        [Display(Name = "Due")]
+        public Boolean Due  { get; set; }
+
+        //***************************************************************************
+        //* Refers to the relationship between VOTE and the USER
+        //* A USER may have multiple VOTE  
+        public ICollection<Vote> Votes { get; set; }
+        //* Refers to the relationship between USER and the PUBLICATION
+        //* A USER may have multiple PUBLICATION
+        public ICollection<Publication> Publications { get; set; }
+        //* Refers to the relationship between USER and the ACTION
+        //* A USER may have multiple ACTION
+        public ICollection<Action> Actions { get; set; }
+        //* Refers to the relationship between USER and the REPLY
+        //* A USER may have multiple REPLY
+        public ICollection<Reply> Replies { get; set; }
+        //***************************************************************************
         
+        //***************************************************************************
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType

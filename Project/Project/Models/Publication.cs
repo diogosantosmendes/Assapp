@@ -9,7 +9,7 @@ namespace Project.Models
 {
     public class Publication
     {
-        // Construtor
+        // Constructor
         public Publication()
         {
             Replies = new HashSet<Reply>();
@@ -27,6 +27,8 @@ namespace Project.Models
         public String Summary { get; set; }
 
         public Boolean Accepted { get; set; }
+
+        public String Form { get; set; }
 
         //******************************************************************************************
         //*********************    Foreign Keys definition      ************************************

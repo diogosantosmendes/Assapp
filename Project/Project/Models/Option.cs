@@ -13,6 +13,7 @@ namespace Project.Models
         public Option()
         {
             Votes = new HashSet<Vote>();
+            Polls = new HashSet<Poll>();
         }
 
         [Key]
@@ -20,21 +21,13 @@ namespace Project.Models
 
         public String Name { get; set; }
 
-        //*********************************************************************************************
-        //*********************    Foreign Keys definition      ***************************************
-        //*********************************************************************************************
-
-        public Type Type { get; set; } // associates in C# the OPTION with the TYPE of the POLL
-        [ForeignKey("Type")]
-        public int TypeFK { get; set; } // associates in SQL the OPTION with the TYPE of the POLL
-
-        //*********************   END Foreign Keys definition    *************************************
-        //********************************************************************************************
-
         //***************************************************************************
         //* Refers to the relationship between OPTION and the VOTE
         //* A OPTION may have multiple VOTE   
         public ICollection<Vote> Votes { get; set; }
+        //* Refers to the relationship between OPTION and the VOTE
+        //* Many OPTIONS may have multiple POLLS   
+        public ICollection<Poll> Polls { get; set; }
         //***************************************************************************
     }
 }
