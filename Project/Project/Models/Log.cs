@@ -7,7 +7,7 @@ using System.Web;
 
 namespace Project.Models
 {
-    public class Action
+    public class Log
     {
         [Key]
         public int ID { get; set; }

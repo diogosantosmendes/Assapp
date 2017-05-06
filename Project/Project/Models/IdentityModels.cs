@@ -21,7 +21,7 @@ namespace Project.Models
             Replies = new HashSet<Reply>();
             Votes = new HashSet<Vote>();
             Publications = new HashSet<Publication>();
-            Actions = new HashSet<Action>();
+            Logs = new HashSet<Log>();
         }
 
         [Display(Name = "Name")]
@@ -29,9 +29,6 @@ namespace Project.Models
         
         [Display(Name = "Partner Number")]
         public string Partner { get; set; }
-        
-        [Display(Name = "Phone")]
-        public string Phone { get; set; }
 
         [Display(Name = "Due")]
         public Boolean Due  { get; set; }
@@ -43,9 +40,9 @@ namespace Project.Models
         //* Refers to the relationship between USER and the PUBLICATION
         //* A USER may have multiple PUBLICATION
         public ICollection<Publication> Publications { get; set; }
-        //* Refers to the relationship between USER and the ACTION
-        //* A USER may have multiple ACTION
-        public ICollection<Action> Actions { get; set; }
+        //* Refers to the relationship between USER and the LOG
+        //* A USER may have multiple LOG
+        public ICollection<Log> Logs { get; set; }
         //* Refers to the relationship between USER and the REPLY
         //* A USER may have multiple REPLY
         public ICollection<Reply> Replies { get; set; }
@@ -79,21 +76,19 @@ namespace Project.Models
         /**************************************************************************************************************************
          * representar as tabelas a criar na base de dados
          * -----------------------------------------------
-         *  DbSet<Action> Action            -> representa uma tabela da base de dados (neste caso chamada 'Action') com a classe Action
+         *  DbSet<Log> Log                  -> representa uma tabela da base de dados (neste caso chamada 'Log') com a classe Log
          *  DbSet<Event> Event              -> representa uma tabela da base de dados (neste caso chamada 'Event') com a classe Event
          *  DbSet<Option> Option            -> representa uma tabela da base de dados (neste caso chamada 'Option') com a classe Option
          *  DbSet<Poll> Poll                -> representa uma tabela da base de dados (neste caso chamada 'Poll') com a classe Poll
          *  DbSet<Publication> Publication  -> representa uma tabela da base de dados (neste caso chamada 'Publication') com a classe Publication
          *  DbSet<eply> Reply               -> representa uma tabela da base de dados (neste caso chamada 'Reply') com a classe Reply
-         *  DbSet<Type> Type                -> representa uma tabela da base de dados (neste caso chamada 'Type') com a classe Type
          *  DbSet<Vote> Vote                -> representa uma tabela da base de dados (neste caso chamada 'Vote') com a classe Vote
          **************************************************************************************************************************/
-        public virtual DbSet<Action> Action { get; set; }
+        public virtual DbSet<Log> Log { get; set; }
         public virtual DbSet<Publication> Publication { get; set; }
         public virtual DbSet<Event> Event { get; set; }
         public virtual DbSet<Poll> Poll { get; set; }
         public virtual DbSet<Reply> Reply { get; set; }
-        public virtual DbSet<Type> Type { get; set; }
         public virtual DbSet<Option> Option { get; set; }
         public virtual DbSet<Vote> Vote { get; set; }
         //************************************************************************************************************************

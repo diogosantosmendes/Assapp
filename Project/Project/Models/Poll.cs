@@ -22,6 +22,10 @@ namespace Project.Models
 
         public String Matter { get; set; }
 
+        public Boolean Finished { get; set; }
+
+        public Boolean Visible { get; set; }
+
         //***************************************************************************
         //* Refers to the relationship between POOL and the VOTE
         //* A POLL may have multiple VOTE   

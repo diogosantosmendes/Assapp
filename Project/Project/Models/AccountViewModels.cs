@@ -83,8 +83,12 @@ namespace Project.Models
         // *****************************************************************
         // User data required for this system
         [Required]
-        [Display(Name = "Name")]
+        [Display(Name = "First Name")]
         public string Name { get; set; }
+
+        [Required]
+        [Display(Name = "Last Name")]
+        public string Nickname { get; set; }
 
         [Required]
         [Display(Name = "Partner Number")]
