@@ -38,10 +38,10 @@ namespace Project.Migrations
                     roleManager.Create(new IdentityRole(role));
                 }
                 // Creates the users list
-                var users = new List<ApplicationUser>
+                var users = new List<User>
                 {
                     // Admin
-                    new ApplicationUser {
+                    new User {
                         Name ="Admin Name",
                         Email ="admin@a.a",
                         UserName = "admin@a.a",
@@ -53,7 +53,7 @@ namespace Project.Migrations
                         SecurityStamp = Guid.NewGuid().ToString("D")
                     },
                     // Collaborator
-                    new ApplicationUser {
+                    new User {
                         Name ="Collaborator Name",
                         Email ="collaborator@a.a",
                         UserName ="collaborator@a.a",
@@ -65,7 +65,7 @@ namespace Project.Migrations
                         SecurityStamp = Guid.NewGuid().ToString("D")
                     },
                     // Partner
-                    new ApplicationUser {
+                    new User {
                         Name ="Partner Name",
                         Email ="partner@a.a",
                         UserName ="partner@a.a",
@@ -77,7 +77,7 @@ namespace Project.Migrations
                         SecurityStamp = Guid.NewGuid().ToString("D")
                     },
                     // Associated
-                    new ApplicationUser {
+                    new User {
                         Name ="Associated Name",
                         Email ="associated@a.a",
                         UserName ="associated@a.a",
@@ -90,9 +90,9 @@ namespace Project.Migrations
                     }
                 };
                 // Inicializes the tool that manage the users in the database
-                var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
+                var userManager = new UserManager<User>(new UserStore<User>(context));
                 // Inserts users in the database
-                foreach (ApplicationUser user in users)
+                foreach (User user in users)
                 {
                     userManager.Create(user, "123qwe");
                 }
