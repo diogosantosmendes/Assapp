@@ -18,6 +18,7 @@ namespace Project.Models
 
         public String Description { get; set; }
 
+        [DisplayFormat(DataFormatString = "{hh:mm:ss - d MMM yyyy}")]
         public DateTime Hour { get; set; }
 
         //******************************************************************************************
@@ -40,6 +41,7 @@ namespace Project.Models
         public Publication()
         {
             Replies = new HashSet<Reply>();
+            this.CreatedIn = DateTime.Now;
         }
 
         [Key]
@@ -62,6 +64,9 @@ namespace Project.Models
 
         [DefaultValue(null)]
         public String LinkToForm { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:d MMM yyyy}")]
+        public DateTime CreatedIn { get; set; }
 
         //******************************************************************************************
         //*********************    Foreign Keys definition      ************************************
@@ -102,6 +107,7 @@ namespace Project.Models
         [Key]
         public int ID { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:dddd, d MMM yyyy hh:mm}")]
         public DateTime Day { get; set; }
 
         public String Local { get; set; }
@@ -123,7 +129,7 @@ namespace Project.Models
         {
             Votes = new HashSet<Vote>();
             Publications = new HashSet<Publication>();
-            Options = new HashSet<Option>();
+            Choices = new HashSet<Choice>();
         }
 
         [Key]
@@ -131,9 +137,9 @@ namespace Project.Models
 
         public String Matter { get; set; }
 
-        public Boolean Finished { get; set; }
+        public Boolean IsFinished { get; set; }
 
-        public Boolean Visible { get; set; }
+        public Boolean IsVisible { get; set; }
 
         //*******************************************************************************************
         //* Refers to the relationship between POOL and the VOTE
@@ -143,8 +149,8 @@ namespace Project.Models
         //* A POLL may have multiple PUBLICATION   
         public ICollection<Publication> Publications { get; set; }
         //* Refers to the relationship between POOL and the PUBLICATION
-        //* Many POLLS may have multiple OPTIONS
-        public ICollection<Option> Options { get; set; }
+        //* A POLL may have multiple CHOICES
+        public ICollection<Choice> Choices { get; set; }
         //*******************************************************************************************
     }
 
@@ -186,7 +192,7 @@ namespace Project.Models
         public Option()
         {
             Votes = new HashSet<Vote>();
-            Polls = new HashSet<Poll>();
+            Choices = new HashSet<Choice>();
         }
 
         [Key]
@@ -199,8 +205,8 @@ namespace Project.Models
         //* A OPTION may have multiple VOTE   
         public ICollection<Vote> Votes { get; set; }
         //* Refers to the relationship between OPTION and the VOTE
-        //* Many OPTIONS may have multiple POLLS   
-        public ICollection<Poll> Polls { get; set; }
+        //* A OPTION may have multiple CHOICES 
+        public ICollection<Choice> Choices { get; set; }
         //*****************************************************************************************
     }
 
@@ -227,5 +233,25 @@ namespace Project.Models
         //*********************   END Foreign Keys definition    *********************************
         //****************************************************************************************
 
+    }
+
+    public class Choice
+    {
+        //*****************************************************************************************
+        //*********************    Foreign Keys definition      ***********************************
+
+        public Poll Poll { get; set; } // associates in C# the CHOICE with the POLL
+        [Column(Order = 0), Key, ForeignKey("Poll")]
+        public int PollFK { get; set; } // associates in SQL the CHOICE with the POLL
+
+        public virtual Option Option { get; set; } // associates in C# the CHOICE with the OPTION
+        [Column(Order = 1), Key, ForeignKey("Option")]
+        public int OptionFK { get; set; } // associates in SQL the CHOICE with the OPTION
+
+        //*********************   END Foreign Keys definition    *********************************
+        //****************************************************************************************
+
+        [DefaultValue(0)]
+        public int Count { get; set; }
     }
 }

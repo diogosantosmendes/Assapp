@@ -342,7 +342,6 @@ a {
 a:hover,
 a:focus {
   color: #2a6496;
-  text-decoration: underline;
 }
 
 a:focus {
@@ -4809,16 +4808,16 @@ textarea.input-group-sm > .input-group-btn > .btn {
 }
 
 .label {
-  display: inline;
+  display: inline-flex;
   padding: .2em .6em .3em;
-  font-size: 75%;
+  font-size: 100%;
   font-weight: bold;
   line-height: 1;
   color: #ffffff;
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
-  border-radius: .25em;
+  border-radius: 1em;
 }
 
 .label[href]:hover,

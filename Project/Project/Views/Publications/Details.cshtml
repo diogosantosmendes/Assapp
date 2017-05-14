@@ -1,0 +1,114 @@
+﻿@model Project.Models.Publication
+
+@if (TempData["Inf"] != null)
+{
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">INFO</h4>
+                </div>
+                <div class="modal-body">
+                    <p>@TempData["Inf"]</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+@if (TempData["Err"] != null)
+{
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">ERRO</h4>
+                </div>
+                <div class="modal-body">
+                    <p>@TempData["Err"]</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+
+<h2 style="text-align:center">@Html.DisplayFor(model => model.Name)</h2>
+
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12">
+        @* Date *@
+        <div style="text-align:right;"><span class="label label-default">@Html.DisplayFor(model => Model.CreatedIn)</span></div>
+    </div>
+    <div class="col-xs-12 col-sm-7">
+        @* Image *@
+        @if (Model.Image != null)
+            {<img src="@Url.Content(Model.Image)" class="img-thumbnail" style="max-height:400px;"/> }
+    </div>
+    @* Event *@
+    @if (Model.Event != null)
+    {
+        <div class="col-xs-12 col-sm-5 " style="text-align:center">
+            <h4>
+                <span class="label label-warning">@Html.DisplayFor(model => Model.Event.Day)</span>
+            </h4>
+        </div>
+        <div class="col-xs-12 col-sm-5" style="text-align:center">
+            <h4>
+                <span class="label label-warning">@Html.DisplayFor(model => Model.Event.Local)</span>
+            </h4>
+        </div>
+    }
+    @* Summary *@
+    @if (Model.Summary != null)
+    {
+        <div class="col-xs-12 col-sm-5"><p style="text-align:center">@Html.DisplayFor(model => Model.Summary)</p></div>
+    }
+</div>
+
+<p>@Html.DisplayFor(model => Model.Description)</p>
+
+@if (Model.Poll != null)
+{
+    if (!Model.Poll.IsFinished)
+    {
+
+
+        <h4><span class="label label-primary" style="text-align:center">@Html.DisplayFor(model => Model.Poll.Matter)</span></h4>
+        using (Html.BeginForm("Vote", "Publications", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            foreach (var choice in Model.Poll.Choices)
+            {
+                @Html.RadioButton("OptionID", choice.Option.ID)
+                @Html.DisplayFor(mode => choice.Option.Name)
+                <br />
+            }
+            <input type="hidden" name="PollID" value=@Model.Poll.ID />
+            <input type="hidden" name="PublicationID" value=@Model.ID />
+            <input type="submit" value="Vote" class="btn btn-default" />
+        }
+
+
+
+
+    }
+}
+
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

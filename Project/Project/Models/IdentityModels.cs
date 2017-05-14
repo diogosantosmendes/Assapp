@@ -83,6 +83,7 @@ namespace Project.Models
          *  DbSet<Publication> Publication  -> representa uma tabela da base de dados (neste caso chamada 'Publication') com a classe Publication
          *  DbSet<eply> Reply               -> representa uma tabela da base de dados (neste caso chamada 'Reply') com a classe Reply
          *  DbSet<Vote> Vote                -> representa uma tabela da base de dados (neste caso chamada 'Vote') com a classe Vote
+         *  DbSet<Choice> Choice            -> representa uma tabela da base de dados (neste caso chamada 'Choice') com a classe Choice
          **************************************************************************************************************************/
         public virtual DbSet<Log> Log { get; set; }
         public virtual DbSet<Publication> Publication { get; set; }
@@ -91,6 +92,7 @@ namespace Project.Models
         public virtual DbSet<Reply> Reply { get; set; }
         public virtual DbSet<Option> Option { get; set; }
         public virtual DbSet<Vote> Vote { get; set; }
+        public virtual DbSet<Choice> Choice { get; set; }
         //************************************************************************************************************************
 
         public static ApplicationDbContext Create()

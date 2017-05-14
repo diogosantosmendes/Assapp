@@ -131,11 +131,11 @@ namespace Project.Migrations
                 // Creates the polls list
                 var polls = new List<Poll>
                 {
-                    new Poll{Finished=false, Visible=false, Matter="Is it true cannibals don't eat clowns because they taste funny?", Options=options.Take(2).ToList()},
-                    new Poll{Finished=false, Visible=false, Matter="If you write a book about failure, and it doesn't sell, is it called success?", Options=options.Take(2).ToList()},
-                    new Poll{Finished=false, Visible=true, Matter="What day do you want dinner?", Options=options.Skip(5).Take(7).ToList()},
-                    new Poll{Finished=true, Visible=false, Matter="Does looking at a picture of the sun hurt your eyes?", Options=options.Take(2).ToList()},
-                    new Poll{Finished=true, Visible=true, Matter="Who wants new elections?", Options=options.Skip(12).ToList()}
+                    new Poll{IsFinished=false, IsVisible=false, Matter="Is it true cannibals don't eat clowns because they taste funny?"},
+                    new Poll{IsFinished=false, IsVisible=false, Matter="If you write a book about failure, and it doesn't sell, is it called success?"},
+                    new Poll{IsFinished=false, IsVisible=true, Matter="What day do you want dinner?"},
+                    new Poll{IsFinished=true, IsVisible=false, Matter="Does looking at a picture of the sun hurt your eyes?"},
+                    new Poll{IsFinished=true, IsVisible=true, Matter="Who wants new elections?"}
 
                 };
                 // Inserts polls in the database
@@ -152,6 +152,28 @@ namespace Project.Migrations
                 // Inserts votes in the database
                 votes.ForEach(vote => context.Vote.Add(vote));
                 context.SaveChanges();
+                // Creates the choices list
+                var choices = new List<Choice>
+                {
+                    new Choice{ Option=options[0], Poll=polls[0]},
+                    new Choice{ Option=options[1], Poll=polls[0]},
+                    new Choice{ Option=options[0], Poll=polls[1]},
+                    new Choice{ Option=options[1], Poll=polls[1]},
+                    new Choice{ Option=options[5], Poll=polls[2]},
+                    new Choice{ Option=options[6], Poll=polls[2]},
+                    new Choice{ Option=options[7], Poll=polls[2]},
+                    new Choice{ Option=options[8], Poll=polls[2]},
+                    new Choice{ Option=options[9], Poll=polls[2]},
+                    new Choice{ Option=options[10], Poll=polls[2]},
+                    new Choice{ Option=options[11], Poll=polls[2]},
+                    new Choice{ Option=options[0], Poll=polls[3]},
+                    new Choice{ Option=options[1], Poll=polls[3]},
+                    new Choice{ Option=options[12], Poll=polls[4]},
+                    new Choice{ Option=options[13], Poll=polls[4]}
+                };
+                // Inserts choices in the database
+                choices.ForEach(choice => context.Choice.Add(choice));
+                context.SaveChanges();
                 // Creates the events list
                 var events = new List<Event>
                 {
@@ -165,15 +187,17 @@ namespace Project.Migrations
                 // Creates the publications list
                 var publications = new List<Publication>
                 {
-                    new Publication { Name="Search for coconuts in the Tianzi mountains", Accepted=true, Description="Great adventure to look for coconuts in the mountain. Good luck.", User=users[1],  Image="Tianzi-mountains.jpg", Event= events[0] },
-                    new Publication { Name="Someone wants to be president", Accepted=false, User=users[1], Poll= polls[4] },
-                    new Publication { Name="Dinner in honor of NeverWere", Accepted=true, User=users[1], Poll= polls[2] },
-                    new Publication { Name="Let's put the wedding ring", Accepted=true, Description="Because he's alone", User=users[1], Image="The-Hand-in-the-Desert.jpg", Event= events[2] },
-                    new Publication { Name="13th run for pregnant women", Accepted=true, Description="For children born healthy", User=users[1], Image="Giant_s-Causeway.jpg", Event= events[1] },
-                    new Publication { Name="What you can eat", Accepted=true, Description="description", User=users[1], Image="clown.jpg", Poll= polls[0] },
-                    new Publication { Name="A story of success", Accepted=true, User=users[1], Poll= polls[1] },
-                    new Publication { Name="The real question", Accepted=true, User=users[1], Image="the-sun-in-the-sky.jpg", Poll= polls[3] }
+                    new Publication { Name="Search for coconuts in the Tianzi mountains", Accepted=true, Description="Great adventure to look for coconuts in the mountain. Good luck.", User=users[1],  Image="Tianzi-mountains.jpg", Event= events[0], Summary="Some summarySome summarySome summarySome summary" },
+                    new Publication { Name="Someone wants to be president", Accepted=false, User=users[1], Poll= polls[4], Summary="Some summarySome summarySome summarySome summarySome summarySome summarySome summarySome summary" },
+                    new Publication { Name="Dinner in honor of NeverWere", Accepted=true, User=users[1], Poll= polls[2], Summary="Some summarySome summarySome summarySome summarySome summarySome summarySome summarySome summary" },
+                    new Publication { Name="Let's put the wedding ring", Accepted=true, Description="Because he's alone", User=users[1], Image="The-Hand-in-the-Desert.jpg", Event= events[2], Summary="Some summarySome summarySome summarySome summary" },
+                    new Publication { Name="13th run for pregnant women", Accepted=true, Description="For children born healthy", User=users[1], Image="Giant_s-Causeway.jpg", Event= events[1], Summary="Some summarySome summary" },
+                    new Publication { Name="What you can eat", Accepted=true, Description="description", User=users[1], Image="clown.jpg", Poll= polls[0], Summary="Some summarySome summarySome summarySome summary" },
+                    new Publication { Name="A story of success", Accepted=true, User=users[1], Poll= polls[1], Summary="Some summarySome summarySome summarySome summary" }
                 };
+                System.Threading.Thread.Sleep(1000);
+                publications.Add(new Publication { Name = "The real question", Accepted = true, User = users[1], Image = "the-sun-in-the-sky.jpg", Poll = polls[3], Summary = "Some summarySome summarySome summarySome summary" });
+
                 // Inserts publications in the database
                 publications.ForEach(publication => context.Publication.AddOrUpdate(p => p.ID, publication));
                 context.SaveChanges();
