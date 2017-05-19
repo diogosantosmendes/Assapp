@@ -32,8 +32,8 @@ namespace Project.Models
         [Display(Name = "Partner Number")]
         public string Partner { get; set; }
 
-        [Display(Name = "Due")]
-        public Boolean Due  { get; set; }
+        [Display(Name = "Last Due Payment")]
+        public DateTime DuePayday  { get; set; }
 
         [Required]
         [Display(Name = "Registration date")]

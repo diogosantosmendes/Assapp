@@ -47,7 +47,7 @@ namespace Project.Migrations
                         UserName = "admin@a.a",
                         PhoneNumber ="+351987654321",
                         Partner ="0000001",
-                        Due =true,
+                        DuePayday = DateTime.Now,
                         EmailConfirmed = true,
                         PhoneNumberConfirmed = true,
                         SecurityStamp = Guid.NewGuid().ToString("D")
@@ -59,7 +59,7 @@ namespace Project.Migrations
                         UserName ="collaborator@a.a",
                         PhoneNumber ="+351987654321",
                         Partner ="0000002",
-                        Due =true,
+                        DuePayday = DateTime.Now,
                         EmailConfirmed = true,
                         PhoneNumberConfirmed = true,
                         SecurityStamp = Guid.NewGuid().ToString("D")
@@ -71,7 +71,7 @@ namespace Project.Migrations
                         UserName ="partner@a.a",
                         PhoneNumber ="+351987654321",
                         Partner ="0000003",
-                        Due =true,
+                        DuePayday = DateTime.Now,
                         EmailConfirmed = true,
                         PhoneNumberConfirmed = true,
                         SecurityStamp = Guid.NewGuid().ToString("D")
@@ -83,7 +83,7 @@ namespace Project.Migrations
                         UserName ="associated@a.a",
                         PhoneNumber ="+351987654321",
                         Partner ="0000004",
-                        Due =true,
+                       
                         EmailConfirmed = true,
                         PhoneNumberConfirmed = true,
                         SecurityStamp = Guid.NewGuid().ToString("D")
