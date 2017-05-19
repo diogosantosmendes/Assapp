@@ -204,10 +204,10 @@ namespace Project.Migrations
                 // Creates the replies list
                 var replies = new List<Reply>
                 {
-                    new Reply{ Hour=DateTime.Now, Publication=publications[0], User=users[2], Visible=true, Content="dont like coconuts"},
-                    new Reply{ Hour=DateTime.Now, Publication=publications[0], User=users[1], Visible=true, Content="more for me"},
-                    new Reply{ Hour=DateTime.Now, Publication=publications[0], User=users[2], Visible=false, Content="f... you mate"},
-                    new Reply{ Hour=DateTime.Now, Publication=publications[3], User=users[2], Visible=true, Content="And who is not religious?"},
+                    new Reply{ Hour=DateTime.Now, Publication=publications[0], User=users[2], IsVisible=true, Content="dont like coconuts"},
+                    new Reply{ Hour=DateTime.Now, Publication=publications[0], User=users[1], IsVisible=true, Content="more for me"},
+                    new Reply{ Hour=DateTime.Now, Publication=publications[0], User=users[2], IsVisible=false, Content="f... you mate"},
+                    new Reply{ Hour=DateTime.Now, Publication=publications[3], User=users[2], IsVisible=true, Content="And who is not religious?"},
                 };
                 // Inserts replies in the database
                 replies.ForEach(reply => context.Reply.AddOrUpdate(r => r.ID, reply));

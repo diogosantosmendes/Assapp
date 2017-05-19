@@ -22,8 +22,10 @@ namespace Project.Models
             Votes = new HashSet<Vote>();
             Publications = new HashSet<Publication>();
             Logs = new HashSet<Log>();
+            RegisterDate = DateTime.Now;
         }
 
+        [Required]
         [Display(Name = "Name")]
         public string Name { get; set; }
         
@@ -33,17 +35,22 @@ namespace Project.Models
         [Display(Name = "Due")]
         public Boolean Due  { get; set; }
 
+        [Required]
+        [Display(Name = "Registration date")]
+        [DisplayFormat(DataFormatString = "{hh:mm - d MMM yyyy}")]
+        public DateTime RegisterDate { get; set; }
+
         //***************************************************************************
-        //* Refers to the relationship between VOTE and the USER
+        //* Refers the relationship between VOTE and the USER
         //* A USER may have multiple VOTE  
         public ICollection<Vote> Votes { get; set; }
-        //* Refers to the relationship between USER and the PUBLICATION
+        //* Refers the relationship between USER and the PUBLICATION
         //* A USER may have multiple PUBLICATION
         public ICollection<Publication> Publications { get; set; }
-        //* Refers to the relationship between USER and the LOG
+        //* Refers the relationship between USER and the LOG
         //* A USER may have multiple LOG
         public ICollection<Log> Logs { get; set; }
-        //* Refers to the relationship between USER and the REPLY
+        //* Refers the relationship between USER and the REPLY
         //* A USER may have multiple REPLY
         public ICollection<Reply> Replies { get; set; }
         //***************************************************************************
@@ -62,28 +69,26 @@ namespace Project.Models
     public class ApplicationDbContext : IdentityDbContext<User>
     {
         /**************************************************************************************************************************
-         * especificar onde será criada a Base de dados
-         * a localização é especificada no ficheiro Web.config
+         * Specifies where the database is created
+         * The location is specified in the 'Web.config' file 
          * ----------------------------------------------------
-         *  depois de definidas as configurações -> NuGet Console:
-         *          PM> Enable-Migrations -EnableAutomaticMigrations
-         *      para habilitar as migrações entre a base de dados definida e a aplicação
-         *          PM> Update-Database
-         *      para atualizar a base de dados tendo em conta as migrações definidas em Migrations/Configurations.cs
+         *  Note:
+         *      PM> Enable-Migrations -EnableAutomaticMigrations  | To enable migrations between the defined database and the application
+         *      PM> Update-Database | To update the database taking into account migrations defined in Migrations / Configurations.cs
          ***************************************************************************************************************************/
         public ApplicationDbContext(): base("DefaultConnection", throwIfV1Schema: false) { }
 
         /**************************************************************************************************************************
          * representar as tabelas a criar na base de dados
          * -----------------------------------------------
-         *  DbSet<Log> Log                  -> representa uma tabela da base de dados (neste caso chamada 'Log') com a classe Log
-         *  DbSet<Event> Event              -> representa uma tabela da base de dados (neste caso chamada 'Event') com a classe Event
-         *  DbSet<Option> Option            -> representa uma tabela da base de dados (neste caso chamada 'Option') com a classe Option
-         *  DbSet<Poll> Poll                -> representa uma tabela da base de dados (neste caso chamada 'Poll') com a classe Poll
-         *  DbSet<Publication> Publication  -> representa uma tabela da base de dados (neste caso chamada 'Publication') com a classe Publication
-         *  DbSet<eply> Reply               -> representa uma tabela da base de dados (neste caso chamada 'Reply') com a classe Reply
-         *  DbSet<Vote> Vote                -> representa uma tabela da base de dados (neste caso chamada 'Vote') com a classe Vote
-         *  DbSet<Choice> Choice            -> representa uma tabela da base de dados (neste caso chamada 'Choice') com a classe Choice
+         *  DbSet<Log> Log                  -> represents a table from database ('Log') with the class Log
+         *  DbSet<Event> Event              -> represents a table from database ('Event') with the class Event
+         *  DbSet<Option> Option            -> represents a table from database ('Option') with the class Option
+         *  DbSet<Poll> Poll                -> represents a table from database ('Poll') with the class Poll
+         *  DbSet<Publication> Publication  -> represents a table from database ('Publication') with the class Publication
+         *  DbSet<eply> Reply               -> represents a table from database ('Reply') with the class Reply
+         *  DbSet<Vote> Vote                -> represents a table from database ('Vote') with the class Vote
+         *  DbSet<Choice> Choice            -> represents a table from database ('Choice') with the class Choice
          **************************************************************************************************************************/
         public virtual DbSet<Log> Log { get; set; }
         public virtual DbSet<Publication> Publication { get; set; }

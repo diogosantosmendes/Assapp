@@ -13,11 +13,17 @@ namespace Project.Models
     ///////////////////////////////////////////////////////////////////////////////////////////////
     public class Log
     {
+        public Log()
+        {
+            Hour = DateTime.Now;
+        }
+
         [Key]
         public int ID { get; set; }
 
+        [Required]
         public String Description { get; set; }
-
+        
         [DisplayFormat(DataFormatString = "{hh:mm:ss - d MMM yyyy}")]
         public DateTime Hour { get; set; }
 
@@ -25,6 +31,7 @@ namespace Project.Models
         //*********************    Foreign Keys definition      ************************************
 
         public User User { get; set; } // associates in C# the USER with the ACTION
+        [Required]
         [ForeignKey("User")]
         public String UserFK { get; set; } // associates in SQL the USER with the ACTION
 
@@ -41,7 +48,7 @@ namespace Project.Models
         public Publication()
         {
             Replies = new HashSet<Reply>();
-            this.CreatedIn = DateTime.Now;
+            CreatedIn = DateTime.Now;
         }
 
         [Key]
@@ -56,14 +63,11 @@ namespace Project.Models
         [DefaultValue(null)]
         public String Description { get; set; }
 
-        [DefaultValue(null)]
+        [Required]
         public String Summary { get; set; }
 
         [DefaultValue(false)]
         public Boolean Accepted { get; set; }
-
-        [DefaultValue(null)]
-        public String LinkToForm { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:d MMM yyyy}")]
         public DateTime CreatedIn { get; set; }
@@ -88,7 +92,7 @@ namespace Project.Models
         //*****************************************************************************************
 
         //*****************************************************************************************
-        //* Refers to the relationship between REPLY and the EVENT
+        //* Refers the relationship between REPLY and the EVENT
         //* A EVENT may have multiple REPLY   
         public ICollection<Reply> Replies { get; set; }
         //*****************************************************************************************
@@ -107,13 +111,15 @@ namespace Project.Models
         [Key]
         public int ID { get; set; }
 
+        [Required]
         [DisplayFormat(DataFormatString = "{0:dddd, d MMM yyyy hh:mm}")]
         public DateTime Day { get; set; }
 
+        [Required]
         public String Local { get; set; }
 
         //*****************************************************************************************
-        //* Refers to the relationship between EVENT and the PUBLICATION
+        //* Refers the relationship between EVENT and the PUBLICATION
         //* A EVENT may have multiple PUBLICATION   
         public ICollection<Publication> Publications { get; set; }
         //*****************************************************************************************
@@ -135,20 +141,26 @@ namespace Project.Models
         [Key]
         public int ID { get; set; }
 
+        [Required]
         public String Matter { get; set; }
 
+        [DefaultValue(false)]
         public Boolean IsFinished { get; set; }
 
+        [DefaultValue(false)]
         public Boolean IsVisible { get; set; }
 
+        [DefaultValue(null)]
+        public String LinkToForm { get; set; }
+
         //*******************************************************************************************
-        //* Refers to the relationship between POOL and the VOTE
+        //* Refers the relationship between POOL and the VOTE
         //* A POLL may have multiple VOTE   
         public ICollection<Vote> Votes { get; set; }
-        //* Refers to the relationship between POOL and the PUBLICATION
+        //* Refers the relationship between POOL and the PUBLICATION
         //* A POLL may have multiple PUBLICATION   
         public ICollection<Publication> Publications { get; set; }
-        //* Refers to the relationship between POOL and the PUBLICATION
+        //* Refers the relationship between POOL and the PUBLICATION
         //* A POLL may have multiple CHOICES
         public ICollection<Choice> Choices { get; set; }
         //*******************************************************************************************
@@ -159,14 +171,22 @@ namespace Project.Models
     ///////////////////////////////////////////////////////////////////////////////////////////////
     public class Reply
     {
+        public Reply()
+        {
+            Hour = DateTime.Now;
+        }
+
         [Key]
         public int ID { get; set; }
-
+        
+        [DisplayFormat(DataFormatString = "{hh:mm:ss - d MMM yyyy}")]
         public DateTime Hour { get; set; }
 
+        [Required]
         public String Content { get; set; }
 
-        public Boolean Visible { get; set; }
+        [DefaultValue(true)]
+        public Boolean IsVisible { get; set; }
 
         //*********************************************************************************************
         //*********************    Foreign Keys definition      ***************************************
@@ -198,13 +218,14 @@ namespace Project.Models
         [Key]
         public int ID { get; set; }
 
+        [Required]
         public String Name { get; set; }
 
         //*****************************************************************************************
-        //* Refers to the relationship between OPTION and the VOTE
+        //* Refers the relationship between OPTION and the VOTE
         //* A OPTION may have multiple VOTE   
         public ICollection<Vote> Votes { get; set; }
-        //* Refers to the relationship between OPTION and the VOTE
+        //* Refers the relationship between OPTION and the VOTE
         //* A OPTION may have multiple CHOICES 
         public ICollection<Choice> Choices { get; set; }
         //*****************************************************************************************
@@ -227,6 +248,7 @@ namespace Project.Models
         public int PollFK { get; set; } // associates in SQL the VOTE with the POLL
 
         public virtual Option Option { get; set; } // associates in C# the VOTE with the OPTION
+        [Required]
         [ForeignKey("Option")]
         public int OptionFK { get; set; } // associates in SQL the VOTE with the OPTION
 
