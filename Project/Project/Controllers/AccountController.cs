@@ -108,7 +108,7 @@ namespace Project.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new User { UserName = model.Email, Email = model.Email, PhoneNumber = model.Phone, Due=false, Name= model.Name+" "+model.Nickname, Partner = model.Partner };
+                var user = new User { UserName = model.Email, Email = model.Email, PhoneNumber = model.Phone, Name= model.Name+" "+model.Nickname, Partner = model.Partner };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

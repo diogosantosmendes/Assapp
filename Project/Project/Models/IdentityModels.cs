@@ -6,6 +6,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System;
+using System.ComponentModel;
 
 namespace Project.Models
 {
@@ -32,6 +33,7 @@ namespace Project.Models
         [Display(Name = "Partner Number")]
         public string Partner { get; set; }
 
+        [DefaultValue(null)]
         [Display(Name = "Last Due Payment")]
         public DateTime DuePayday  { get; set; }
 
