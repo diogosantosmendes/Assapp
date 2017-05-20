@@ -7,6 +7,17 @@ using System.Web;
 
 namespace Project.Models
 {
+    public class PublicationFeedListViewModel
+    {
+        public PublicationFeedListViewModel(List<PublicationFeedViewModel> left, List<PublicationFeedViewModel> right)
+        {
+            Lists = new List<PublicationFeedViewModel>[2];
+            Lists[0] = left;
+            Lists[1] = right;
+        }
+        public List<PublicationFeedViewModel>[] Lists { get; set; }
+    }
+
     public class PublicationFeedViewModel
     {
         public int ID { get; set; }

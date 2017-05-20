@@ -94,7 +94,7 @@ namespace Project.Models
         //*****************************************************************************************
         //* Refers the relationship between REPLY and the EVENT
         //* A EVENT may have multiple REPLY   
-        public ICollection<Reply> Replies { get; set; }
+        public virtual ICollection<Reply> Replies { get; set; }
         //*****************************************************************************************
     }
 
@@ -121,7 +121,7 @@ namespace Project.Models
         //*****************************************************************************************
         //* Refers the relationship between EVENT and the PUBLICATION
         //* A EVENT may have multiple PUBLICATION   
-        public ICollection<Publication> Publications { get; set; }
+        public virtual ICollection<Publication> Publications { get; set; }
         //*****************************************************************************************
     }
 
@@ -156,13 +156,13 @@ namespace Project.Models
         //*******************************************************************************************
         //* Refers the relationship between POOL and the VOTE
         //* A POLL may have multiple VOTE   
-        public ICollection<Vote> Votes { get; set; }
+        public virtual ICollection<Vote> Votes { get; set; }
         //* Refers the relationship between POOL and the PUBLICATION
         //* A POLL may have multiple PUBLICATION   
-        public ICollection<Publication> Publications { get; set; }
+        public virtual ICollection<Publication> Publications { get; set; }
         //* Refers the relationship between POOL and the PUBLICATION
         //* A POLL may have multiple CHOICES
-        public ICollection<Choice> Choices { get; set; }
+        public virtual ICollection<Choice> Choices { get; set; }
         //*******************************************************************************************
     }
 
@@ -224,10 +224,10 @@ namespace Project.Models
         //*****************************************************************************************
         //* Refers the relationship between OPTION and the VOTE
         //* A OPTION may have multiple VOTE   
-        public ICollection<Vote> Votes { get; set; }
+        public virtual ICollection<Vote> Votes { get; set; }
         //* Refers the relationship between OPTION and the VOTE
         //* A OPTION may have multiple CHOICES 
-        public ICollection<Choice> Choices { get; set; }
+        public virtual ICollection<Choice> Choices { get; set; }
         //*****************************************************************************************
     }
 

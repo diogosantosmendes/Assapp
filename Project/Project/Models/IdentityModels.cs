@@ -32,10 +32,9 @@ namespace Project.Models
         
         [Display(Name = "Partner Number")]
         public string Partner { get; set; }
-
-        [DefaultValue(null)]
+        
         [Display(Name = "Last Due Payment")]
-        public DateTime DuePayday  { get; set; }
+        public DateTime? DuePayday  { get; set; }
 
         [Required]
         [Display(Name = "Registration date")]
@@ -45,16 +44,16 @@ namespace Project.Models
         //***************************************************************************
         //* Refers the relationship between VOTE and the USER
         //* A USER may have multiple VOTE  
-        public ICollection<Vote> Votes { get; set; }
+        public virtual ICollection<Vote> Votes { get; set; }
         //* Refers the relationship between USER and the PUBLICATION
         //* A USER may have multiple PUBLICATION
-        public ICollection<Publication> Publications { get; set; }
+        public virtual ICollection<Publication> Publications { get; set; }
         //* Refers the relationship between USER and the LOG
         //* A USER may have multiple LOG
-        public ICollection<Log> Logs { get; set; }
+        public virtual ICollection<Log> Logs { get; set; }
         //* Refers the relationship between USER and the REPLY
         //* A USER may have multiple REPLY
-        public ICollection<Reply> Replies { get; set; }
+        public virtual ICollection<Reply> Replies { get; set; }
         //***************************************************************************
         
         //***************************************************************************

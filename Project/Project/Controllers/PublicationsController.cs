@@ -46,7 +46,13 @@ namespace Project.Controllers
                     model.Add(newPub);
                 }
             }
-            return View(model);
+
+            int count = model.Count() / 2;
+
+
+           PublicationFeedListViewModel toSend = new PublicationFeedListViewModel(model.GetRange(0, count), model.GetRange(count, count));
+
+            return View(toSend);
         }
 
         // GET: Publications/Details/5

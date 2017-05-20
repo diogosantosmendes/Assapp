@@ -83,7 +83,6 @@ namespace Project.Migrations
                         UserName ="associated@a.a",
                         PhoneNumber ="+351987654321",
                         Partner ="0000004",
-                       
                         EmailConfirmed = true,
                         PhoneNumberConfirmed = true,
                         SecurityStamp = Guid.NewGuid().ToString("D")

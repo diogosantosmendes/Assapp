@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Project.Models.PublicationFeedViewModel>
+﻿@model Project.Models.PublicationFeedListViewModel
 
 @{
     ViewBag.Title = "Index";
@@ -11,40 +11,48 @@
 </p>
 
 <div class="row">
-    @foreach (var item in Model)
+    @foreach (var model in Model.Lists)
     {
-        <div class="col-sm-12">
-            <a href="@Url.Action("Details", new { id = item.ID })">
-                <div class="thumbnail">
-                    @* Title *@
-                    <h2 style="text-align:center">@Html.DisplayFor(modelItem => item.Name)</h2>
-                    <div class="row">
-                        <div class="col-xs-6">
-                            @* Type *@
-                            @if (item.IsEvent)
-                            { <span class="label label-warning">Event</span>}
-                            @if (item.IsPoll)
-                            { <span class="label label-primary">Poll</span>}
-                        </div>
-                        <div class="col-xs-6" style="text-align:right">
-                            @* Date *@
-                            <span class="label label-default">@Html.DisplayFor(modelItem => item.CreatedIn)</span>
-                        </div>
-                    </div>
-                    @* Image *@
-                    @if (item.Image != null)
-                    { <img src="@Url.Content(item.Image)" /> }
-                    else
-                    { <img src="~/fonts/semImg.bmp" /> }
-                    @* Text *@
-                    <div class="caption">
-                        @if (item.Summary != null)
-                        { <p class="text-info" style="text-align:center;font-size:18px;">@Html.DisplayFor(modelItem => item.Summary)</p>}
-                    </div>
+        <div class="col-sm-6">
+            @foreach (var item in model)
+            {
+                <div class="row">
+                    <div class="col-sm-12">
+                        <a href="@Url.Action("Details", new { id = item.ID })">
+                            <div class="thumbnail">
+                                @* Title *@
+                                <h2 style="text-align:center">@Html.DisplayFor(modelItem => item.Name)</h2>
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        @* Type *@
+                                        @if (item.IsEvent)
+                                        { <span class="label label-warning">Event</span>}
+                                        @if (item.IsPoll)
+                                        { <span class="label label-primary">Poll</span>}
+                                    </div>
+                                    <div class="col-xs-6" style="text-align:right">
+                                        @* Date *@
+                                        <span class="label label-default">@Html.DisplayFor(modelItem => item.CreatedIn)</span>
+                                    </div>
+                                </div>
+                                @* Image *@
+                                @if (item.Image != null)
+                                { <img src="@Url.Content(item.Image)" /> }
+                                else
+                                { <img src="~/fonts/semImg.bmp" /> }
+                                @* Text *@
+                                <div class="caption">
+                                    @if (item.Summary != null)
+                                    { <p class="text-info" style="text-align:center;font-size:18px;">@Html.DisplayFor(modelItem => item.Summary)</p>}
+                                </div>
 
+                            </div>
+                        </a>
+                    </div>
+                    <hr />
                 </div>
-            </a>
+            }
         </div>
-        <hr />
+
     }
 </div>
