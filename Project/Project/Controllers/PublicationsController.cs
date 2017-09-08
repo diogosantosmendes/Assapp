@@ -8,6 +8,9 @@ using System.Web;
 using System.Web.Mvc;
 using Project.Models;
 using Microsoft.AspNet.Identity;
+using System.IO;
+using System.Diagnostics;
+using System.Web.UI.WebControls;
 
 namespace Project.Controllers
 {
@@ -16,113 +19,184 @@ namespace Project.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Publications
-        public ActionResult Index()
+        public ActionResult Index(int? i)
         {
-            var publications = db.Publication.Include(p => p.Event).Include(p => p.Poll).Include(p => p.User).OrderByDescending(p => p.CreatedIn);
-            List<PublicationFeedViewModel> model = new List<PublicationFeedViewModel>();
-            foreach(Publication pub in publications)
+            int index = i ?? default(int);
+            PublicationIndexViewModel list = new PublicationIndexViewModel
             {
-                if (pub.Accepted)
-                {
-                    PublicationFeedViewModel newPub = new PublicationFeedViewModel {
-                        ID =pub.ID,
-                        Name = pub.Name,
-                        Image = (pub.Image!=null)?"~/fonts/" + pub.Image:null,
-                        Summary = pub.Summary,
-                        CreatedIn = pub.CreatedIn
-                    };
-                    if (pub.PollFK != null)
-                    {
-                        if (pub.EventFK != null)
-                        {
-                            newPub.IsEvent = true;
-                            newPub.IsPoll = true;
-                        }
-                        else newPub.IsPoll = true;
-                    }
-                    else 
-                        if (pub.EventFK != null)
-                            newPub.IsEvent = true;
-                    model.Add(newPub);
-                }
-            }
-
-            int count = model.Count() / 2;
-
-
-           PublicationFeedListViewModel toSend = new PublicationFeedListViewModel(model.GetRange(0, count), model.GetRange(count, count));
-
-            return View(toSend);
+                Index = index,
+                HaveMore = db.Publication.Count() > (index + 8) ? true : false,
+                HaveLess = index == 0 ? false : true,
+                List = db.Publication.Where(x => x.Accepted).OrderByDescending(p => p.CreatedIn).Skip(index).Take(8).ToList()
+            };
+            return View(list);
         }
 
-        // GET: Publications/Details/5
-        public ActionResult Details(int? id)
+        // GET: Publications/Profile
+        public ActionResult Details(int? publicationID)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Publication publication = db.Publication.Where(x => x.ID == id).Include(p => p.Event).Include(p => p.Poll).FirstOrDefault();
-            if (publication == null)
-            {
-                return HttpNotFound();
-            }
-            publication.Image = (publication.Image != null) ? "~/fonts/" + publication.Image : "~/fonts/semImg.bmp";
-            if(publication.Poll!=null)
-                publication.Poll.Choices = db.Choice.Where(x => x.PollFK == publication.PollFK).Include(x=>x.Option).ToList();
-            return View(publication);
+            int index = publicationID ?? default(int);
+            return View(db.Publication.Find(index));
         }
 
-        // POST: Publications/Details/
+
+
+        // GET: Publications/Unaccepted
+        public ActionResult Unaccepted()
+        {
+            return View(db.Publication.Where(x => !x.Accepted).OrderByDescending(p => p.CreatedIn).ToList());
+        }
+
+        // POST: Publications/Vote/
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Vote(int OptionID, int PollID, int PublicationID)
+        public JsonResult Vote(int optionID, int pollID)
+        {
+            if (!db.Vote.Where(x => x.Option.PollFK.Equals(pollID)).Where(x => x.User.UserName.Equals(User.Identity.Name)).Any())
+            {
+                Vote vote = new Vote { OptionFK = optionID, UserFK = User.Identity.GetUserId() };
+                db.Vote.Add(vote);
+                db.SaveChanges();
+                Option option = db.Option.Find(optionID);
+                option.Count++;
+                db.Entry(option).State = EntityState.Modified;
+                db.SaveChanges();
+                return Json(new { result = true, msg = "Voto inserido com sucesso." });
+            }
+            else
+            {
+                return Json(new { result = false, msg = "Já tinha votado anteriormente." });
+            }
+        }
+
+        // POST: Publications/Comment/
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult Comment(String text, int publicationID, String publicationName)
         {
             try
             {
-                Vote vote = new Vote { OptionFK=OptionID, PollFK=PollID, UserFK= User.Identity.GetUserId() };
-                db.Vote.Add(vote);
+                Reply reply = new Reply { Content = text, Hour = DateTime.Now, IsVisible = true, PublicationFK = publicationID, UserFK = User.Identity.GetUserId() };
+                db.Reply.Add(reply);
                 db.SaveChanges();
-                Choice choice = db.Choice.Where(x => x.OptionFK == OptionID).Where(x => x.PollFK == PollID).FirstOrDefault();
-                choice.Count++;
-                db.Entry(choice).State = EntityState.Modified;
-                db.SaveChanges();
-                TempData["Inf"] = "Your vote was successfully inserted.";
-
+                Log(String.Format("Comentou ( {0} ) na publicação: {1}", text, publicationName));
+                return Json(new { result = true, publication = publicationID, hour = reply.Hour.ToString("dd MMM yyyy - hh:mm"), user = db.Users.Find(User.Identity.GetUserId()).Name.ToString() });
             }
-            catch(Exception)
+            catch (Exception ex)
             {
-                TempData["Err"] = "You have already voted on this poll";
+                Console.Write(ex);
+                return Json(new { result = false, msg = "Ocorreu um erro, não foi possível adicionar o seu comentário. Por favor tente mais tarde." });
             }
-            
-            return RedirectToAction("Details", new { id=PublicationID});
+        }
+
+        // POST: Publications/Censor/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult Censor(int replyID)
+        {
+            try
+            {
+                Reply r = db.Reply.Find(replyID);
+                r.IsVisible = r.IsVisible == true ? false : true;
+                db.Entry(r).State = EntityState.Modified;
+                db.SaveChanges();
+                Log(String.Format("Censurou o comentário ( {0} ) de {1} na publicação: {2}", r.Content, r.User.Name, r.Publication.Name));
+                return Json(new { result = true, msg = "A censura foi realizada com sucesso. Atualize a página se pretender retroceder." });
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex);
+                return Json(new { result = false, msg = "Ocorreu um erro, não foi possível censurar o comentário. Por favor tente mais tarde." });
+            }
+        }
+
+        // POST: Publications/Censor/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult ClosePoll(int pollID)
+        {
+            try
+            {
+                Poll p = db.Poll.Find(pollID);
+                p.IsFinished = true;
+                p.IsVisible = true;
+                db.Entry(p).State = EntityState.Modified;
+                db.SaveChanges();
+                Log(String.Format("Encerrou a votação: {0}", p.Matter));
+                return Json(new { result = true, msg = "A votação foi finalizada com sucesso. Atualize a página para consultar os resultados." });
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex);
+                return Json(new { result = false, msg = "Ocorreu um erro, não foi possível encerrar a votação. Por favor tente mais tarde." });
+            }
+        }
+
+        // POST: Publications/Accept/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Accept(int publicationID)
+        {
+            Publication p = db.Publication.Find(publicationID);
+            p.Accepted = true;
+            db.Entry(p).State = EntityState.Modified;
+            db.SaveChanges();
+            Log(String.Format("Permitiu a publicação: {0}", p.Name));
+            return RedirectToAction("Unaccepted");
         }
 
         // GET: Publications/Create
         public ActionResult Create()
         {
-            ViewBag.EventFK = new SelectList(db.Event, "ID", "Local");
-            ViewBag.PollFK = new SelectList(db.Poll, "ID", "Matter");
-            ViewBag.UserFK = new SelectList(db.Users, "Id", "Name");
             return View();
         }
+
 
         // POST: Publications/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Name,Image,Description,Summary,Accepted,LinkToForm,UserFK,PollFK,EventFK")] Publication publication)
+        public ActionResult Create([Bind(Include = "Name,Description,IsEvent,IsPoll,Day,Local,Matter,IsVisible,IsInclusive,LinkToForm,OptionName")] PublicationCreateViewModel form, HttpPostedFileBase file)
         {
             if (ModelState.IsValid)
             {
+                Publication publication = new Publication { CreatedIn = DateTime.Now, Description = form.Description, Name = form.Name, Accepted=false, UserFK=User.Identity.GetUserId()};
+
+                if (form.IsEvent)
+                {
+                    Event e = new Event { Day = Convert.ToDateTime(form.Day), Local = form.Local };
+                    db.Event.Add(e);
+                    db.SaveChanges();
+                    publication.Event = e;
+                }
+
+                if (form.IsPoll)
+                {
+                    Poll p = new Poll { Matter = form.Matter, IsFinished = false, IsInclusive = form.IsInclusive, IsVisible = form.IsVisible, LinkToForm = form.LinkToForm };
+                    db.Poll.Add(p);
+                    db.SaveChanges();
+                    foreach(String option in form.OptionName)
+                    {
+                        Option o = new Option { Name = option, Poll = p, Count = 0 };
+                        db.Option.Add(o);
+                        db.SaveChanges();
+                    }
+                    publication.Poll = p;
+                }
+                
+                if (file != null && file.ContentLength > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString()+Path.GetExtension(file.FileName);
+                    var path = Path.Combine(Server.MapPath("~/fonts"), fileName);
+                    file.SaveAs(path);
+                    publication.Image = fileName;
+                }
+
                 db.Publication.Add(publication);
                 db.SaveChanges();
+                Log(String.Format("Criou uma nova publicação: {0}", publication.Name));
                 return RedirectToAction("Index");
             }
-
-            ViewBag.EventFK = new SelectList(db.Event, "ID", "Local", publication.EventFK);
-            ViewBag.PollFK = new SelectList(db.Poll, "ID", "Matter", publication.PollFK);
-            ViewBag.UserFK = new SelectList(db.Users, "Id", "Name", publication.UserFK);
-            return View(publication);
+            return View("Create");
         }
 
         // GET: Publications/Edit/5
@@ -132,34 +206,121 @@ namespace Project.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Publication publication = db.Publication.Find(id);
+            var publication = db.Publication.Find(id);
+
             if (publication == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.EventFK = new SelectList(db.Event, "ID", "Local", publication.EventFK);
-            ViewBag.PollFK = new SelectList(db.Poll, "ID", "Matter", publication.PollFK);
-            ViewBag.UserFK = new SelectList(db.Users, "Id", "Name", publication.UserFK);
-            return View(publication);
+
+            PublicationEditViewModel viewModel = new PublicationEditViewModel
+            {
+                ID = publication.ID,
+                Name = publication.Name,
+                Description = publication.Description,
+                Image = publication.Image,
+                IsEvent = publication.EventFK != null ? true : false,
+                IsPoll = publication.PollFK != null ? true : false,
+                Day = publication.EventFK != null ? publication.Event.Day : (DateTime?)null,
+                Local = publication.EventFK != null ? publication.Event.Local : null,
+                Matter = publication.PollFK != null ? publication.Poll.Matter : null,
+                IsVisible = publication.PollFK != null ? publication.Poll.IsVisible : false,
+                IsInclusive = publication.PollFK != null ? publication.Poll.IsInclusive : false,
+                LinkToForm = publication.PollFK != null ? publication.Poll.LinkToForm : null,
+                OptionName = publication.PollFK != null ? publication.Poll.Options.Select(z=>z.Name).ToArray(): new List<String>().ToArray()
+            };
+            
+            return View(viewModel);
         }
 
         // POST: Publications/Edit/5
-        // Para se proteger de mais ataques, ative as propriedades específicas a que você quer se conectar. Para 
-        // obter mais detalhes, consulte https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,Name,Image,Description,Summary,Accepted,LinkToForm,UserFK,PollFK,EventFK")] Publication publication)
+        public ActionResult Edit([Bind(Include = "ID,Name,Description,IsEvent,IsPoll,Day,Local,Matter,IsVisible,IsInclusive,LinkToForm,OptionName")] PublicationEditViewModel form, HttpPostedFileBase file)
         {
             if (ModelState.IsValid)
             {
+
+                Publication publication = db.Publication.Find(form.ID);
+                publication.Name = form.Name;
+                publication.Description = form.Description;
+
+                if (publication.EventFK!=null)
+                {
+                    if (form.IsEvent)
+                    {
+                        Event e = db.Event.Find(publication.EventFK);
+                        e.Local = form.Local;
+                        e.Day = Convert.ToDateTime(form.Day);
+                        db.Entry(e).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        publication.EventFK = null;
+                    }
+                }
+                else
+                {
+                    if (form.IsEvent)
+                    {
+                        Event e = new Event { Local = form.Local, Day = Convert.ToDateTime(form.Day) };
+                        db.Event.Add(e);
+                        db.SaveChanges();
+                        publication.Event = e;
+                    }
+                }
+
+                if (publication.PollFK != null)
+                {
+                    if (form.IsPoll)
+                    {
+                        Poll p = db.Poll.Find(publication.PollFK);
+                        p.LinkToForm = form.LinkToForm;
+                        p.IsInclusive = form.IsInclusive;
+                        p.IsVisible = form.IsVisible;
+                        db.Entry(p).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        publication.PollFK = null;
+                    }
+                }
+                else
+                {
+                    if (form.IsPoll)
+                    {
+                        Poll p = new Poll { LinkToForm = form.LinkToForm, IsInclusive = form.IsInclusive, IsVisible = form.IsVisible, Matter = form.Matter, IsFinished = false };
+                        db.Poll.Add(p);
+                        db.SaveChanges();
+
+                        foreach (String option in form.OptionName)
+                        {
+                            Option o = new Option { Name = option, Poll = p, Count = 0 };
+                            db.Option.Add(o);
+                            db.SaveChanges();
+                        }
+                        publication.Poll = p;
+                    }
+                }
+                
+
+                if (file != null && file.ContentLength > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    var path = Path.Combine(Server.MapPath("~/fonts"), fileName);
+                    file.SaveAs(path);
+                    publication.Image = fileName;
+                }
+
                 db.Entry(publication).State = EntityState.Modified;
                 db.SaveChanges();
+
+                Log(String.Format("Editou a publicação: {0}", publication.Name));
                 return RedirectToAction("Index");
             }
-            ViewBag.EventFK = new SelectList(db.Event, "ID", "Local", publication.EventFK);
-            ViewBag.PollFK = new SelectList(db.Poll, "ID", "Matter", publication.PollFK);
-            ViewBag.UserFK = new SelectList(db.Users, "Id", "Name", publication.UserFK);
-            return View(publication);
+            return View("Edit");
         }
 
         protected override void Dispose(bool disposing)
@@ -169,6 +330,13 @@ namespace Project.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private void Log(String content)
+        {
+            Log l = new Log { UserFK = User.Identity.GetUserId(), Hour = DateTime.Now, Description = content };
+            db.Log.Add(l);
+            db.SaveChanges();
         }
     }
 }

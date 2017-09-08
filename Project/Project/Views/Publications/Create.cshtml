@@ -1,99 +1,156 @@
-﻿@model Project.Models.Publication
-
-@{
-    ViewBag.Title = "Create";
-}
-
-<h2>Create</h2>
+﻿@model Project.Models.PublicationCreateViewModel
 
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm("Create", "Publications", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Publication</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="form-group">
-            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+
+    <div class="row">
+        <div class="col-sm-8">
+            <h2>Nova Publicação</h2>
+        </div>
+        <div class="col-sm-4" style="padding-top:3%;padding-bottom:2%;">
+            <div class="pull-right">
+                <button type="submit" value="Create" class="btn btn-primary">Criar</button>
+                <button data-toggle="modal" data-target="#previewModal" class="btn btn-default" onclick="previewBuild()">Pre-visualizar</button>
             </div>
         </div>
+    </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Image, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Image, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
-            </div>
-        </div>
+    <div class="row">
+        <div class="col-lg-8 col-md-10">
+            <div class="container-fluid row">
+                <div class="col-xs-12">
+                    <hr />
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Summary, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Summary, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Summary, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Accepted, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                <div class="checkbox">
-                    @Html.EditorFor(model => model.Accepted)
-                    @Html.ValidationMessageFor(model => model.Accepted, "", new { @class = "text-danger" })
+                @* Title *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-3 text-right", id="crtTitle" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                @* Image *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        <label class="control-label col-md-3 text-right">Imagem da Publicação</label>
+                        <div class="col-md-9">
+                            @Html.TextBox("file", "", new { type = "file", onchange = "loadFile(event)" })
+                        </div>
+                    </div>
+                </div>
+                @* Description *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @style = "height:300px" })
+                            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                @* EVENT *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.IsEvent, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            <label data-toggle="collapse" data-target=".collapseEvent">
+                                @Html.CheckBoxFor(model => model.IsEvent, new { @class = "form-control", @style = "width:0;" })
+                            </label>
+                            @Html.ValidationMessageFor(model => model.IsEvent, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                @* Day *@
+                <div class="col-xs-12 collapseEvent collapse">
+                    <div class="row">
+                        @Html.LabelFor(model => model.Day, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(model => model.Day, new { @class = "form-control", @id= "form_datetime" })
+                            @Html.ValidationMessageFor(model => model.Day, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                @* Local *@
+                <div class="col-xs-12 collapseEvent collapse">
+                    <div class="row">
+                        @Html.LabelFor(model => model.Local, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(model => model.Local, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Local, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                @* POLL *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.IsPoll, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            <label data-toggle="collapse" data-target=".collapsePoll">
+                                @Html.CheckBoxFor(model => model.IsPoll, new { @class = "form-control", @style = "width:0;" })
+                            </label>
+                            @Html.ValidationMessageFor(model => model.IsPoll, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                @* Matter *@
+                <div class="col-xs-12 collapsePoll collapse">
+                    <div class="row">
+                        @Html.LabelFor(model => model.Matter, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(model => model.Matter, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Matter, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                @* Form *@
+                <div class="col-xs-12 collapsePoll collapse">
+                    <div class="row">
+                        @Html.LabelFor(model => model.LinkToForm, htmlAttributes: new { @class = "col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(model => model.LinkToForm, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.LinkToForm, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                @* IsVisible *@
+                <div class="col-xs-12 collapsePoll collapse">
+                    <div class="row">
+                        @Html.LabelFor(model => model.IsVisible, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.CheckBoxFor(model => model.IsVisible, new { @class = "form-control", @style = "width:0;" })
+                            @Html.ValidationMessageFor(model => model.IsVisible, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                @* IsInclusive *@
+                <div class="col-xs-12 collapsePoll collapse">
+                    <div class="row">
+                        @Html.LabelFor(model => model.IsInclusive, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.CheckBoxFor(model => model.IsInclusive, new { @class = "form-control", @style = "width:0;" })
+                            @Html.ValidationMessageFor(model => model.IsInclusive, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                @* Options *@
+                <div class="col-xs-12 collapsePoll collapse">
+                    <div class="row">
+                        @Html.LabelFor(model => Model.OptionName, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            <div class="row" id="options"></div>
+                            <a id="btnAddOption" onclick="addOption()" class="btn btn-default">Adicionar Opção</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.LinkToForm, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.LinkToForm, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.LinkToForm, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.UserFK, "UserFK", htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownList("UserFK", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.UserFK, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.PollFK, "PollFK", htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownList("PollFK", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.PollFK, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.EventFK, "EventFK", htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownList("EventFK", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.EventFK, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </div>
+        <div class="col-lg-4 col-md-2"></div>
     </div>
 }
 
@@ -101,6 +158,52 @@
     @Html.ActionLink("Back to List", "Index")
 </div>
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}
+<!-- Modal -->
+<div class="modal fade" id="previewModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Preview</h4>
+            </div>
+            <div class="modal-body row" id="previewContent">
+                @* Datetime *@
+                <div class="col-xs-12 text-center h5"><span class="label label-default">@DateTime.Now.Year</span></div>
+                @* Title *@
+                <div class="col-xs-12 text-center"><h3 id="titlePreview"></h3></div>
+                @* Image *@
+                <div class="col-xs-12 text-center">
+                    <img class="img-thumbnail" style="max-height:400px;" id="imgPreview"/>
+                </div>
+                @* Day *@
+                <div class="col-xs-12 col-sm-6 text-center">
+                    <label class="h4 text-success" id="dayPreview"></label>
+                </div>
+                @* Local *@
+                <div class="col-xs-12 col-sm-6 text-center">
+                    <label class="h4 text-success" id="localPreview"></label>
+                </div>
+                @* Matter *@
+                <div class="text-center">
+                    <label class="h4 text-warning" id="matterPreview"></label>
+                </div>
+                @* Link to external form *@
+                <div class="text-center" id="linktoformPreview"></div>
+                @* Options *@
+                <div class="col-xs-12 col-md-6 col-lg-4 text-right" style="padding-top:20px;" id="optionsPreview"></div>
+                <div class="col-lg-2"></div>
+                @* Statistics *@
+                <div class="col-xs-12 col-md-6">
+                    <canvas id="canvasToTest" width="350" height="200"></canvas>
+                </div>
+                @* Description *@
+                <div class="col-xs-12"><h5 id="descriptionPreview" style="text-align: justify; padding-left:50px; padding-right:50px;"></h5></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#form_datetime").datetimepicker({ format: 'yyyy-mm-dd hh:ii' });
+    var optionID = 0;
+</script>

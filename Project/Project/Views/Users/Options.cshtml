@@ -1,0 +1,93 @@
+﻿@model IEnumerable<Project.Models.User>
+
+<h2>Opções</h2>
+<hr />
+<ul class="nav nav-tabs">
+    <li class="active h4"><a data-toggle="tab" href="#plan">Plano de Pagamento</a></li>
+    <li class="h4"><a data-toggle="tab" href="#mandate">Mandato</a></li>
+</ul>
+
+<div class="tab-content">
+    <div id="plan" class="tab-pane fade in active">
+        <br />
+        <div class="row">
+            <div class="col-md-6 col-md-offset-1 col-xs-11 col-xs-offset-1">
+                <p>Ao renovar o plano de pagamentos serão retiradas as permissões de sócios os utilizadores que não pertençam aos órgãos sociais. Assim será competência dos órgãos sociais renovarem o estado dos utilizadores no sistema</p>
+            </div>
+            <div class="col-xs-offset-2 col-xs-10">
+                <label class="checkbox"><input type="checkbox" id="agreePlan" /> Li e Concordo</label>
+            </div>
+            <div class="col-xs-12"><br /></div>
+            <div class="col-xs-11 col-xs-offset-1">
+                <H4><span class="glyphicon glyphicon-list-alt"></span><small> Plano a Renovar</small></H4>
+            </div>
+            @using (Html.BeginForm("Renew", "Users", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-xs-11 col-xs-offset-1 col-md-6 col-md-offset-1">
+                    <select name="payPlan" class="form-control">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+                <div class="col-xs-12"><br /></div>
+                <div class="col-xs-11 col-xs-offset-1 col-md-6 col-md-offset-1 text-right">
+                    <input id="finishPlan" type="submit" value="Renovar Plano" class="btn btn-warning" disabled />
+                </div>
+            }
+        </div>
+    </div>
+    <div id="mandate" class="tab-pane fade">
+        <br />
+
+        <div class="row">
+            <div class="col-xs-11 col-xs-offset-1 col-md-6 col-md-offset-1">
+                <p>Ao terminar o mandato perderá todas as permissões de administrador, assim como os órgãos sociais da presente lista serão destituidos.</p>
+                <p>Deverá nomear um novo administrador do sistema, que por sua vez, ficará encarregue de atribuir as permissões de colaborador à devida lista. O Administrador terá acesso ao histórico das ações dos utilizadores, incluindo dos presentes órgãos sociais.</p>
+            </div>
+            <div class="col-xs-10 col-xs-offset-2">
+                <label class="checkbox"><input type="checkbox" id="agreeMandate" /> Li e Concordo</label>
+            </div>
+            <div class="col-xs-12"><br /></div>
+            <div class="col-xs-11 col-xs-offset-1">
+                <H4><span class="glyphicon glyphicon-user"></span><small> Novo Administrador</small></H4>
+            </div>
+            @using (Html.BeginForm("Finish", "Users", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-xs-11 col-xs-offset-1 col-md-6 col-md-offset-1">
+                    <select name="userID" class="form-control">
+                        @foreach (var partner in Model)
+                        {
+                            <option value="@Html.DisplayFor(model=>partner.Id)">@Html.DisplayFor(model => partner.Name)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-xs-12"><br /></div>
+                <div class="col-xs-11 col-xs-offset-1 col-md-6 col-md-offset-1 text-right">
+                    <input id="finishMandate" type="submit" value="Terminar Mandato" class="btn btn-danger" disabled />
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $('#agreeMandate').click(function () {
+        if ($(this).is(':checked')) {
+            $('#finishMandate').removeAttr('disabled');
+        } else {
+            $('#finishMandate').attr('disabled', 'disabled');
+        }
+    });
+
+    $('#agreePlan').click(function () {
+        if ($(this).is(':checked')) {
+            $('#finishPlan').removeAttr('disabled');
+        } else {
+            $('#finishPlan').attr('disabled', 'disabled');
+        }
+    });
+</script>

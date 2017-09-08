@@ -27,19 +27,28 @@ namespace Project.Models
         }
 
         [Required]
-        [Display(Name = "Name")]
+        [Display(Name = "Nome")]
         public string Name { get; set; }
         
-        [Display(Name = "Partner Number")]
-        public string Partner { get; set; }
+        [Display(Name = "Numero de sócio")]
+        public int? Partner { get; set; }
         
-        [Display(Name = "Last Due Payment")]
+        [Display(Name = "Ultimo pagamento de quotas")]
         public DateTime? DuePayday  { get; set; }
 
+        [Display(Name = "Plano de pagamento de quota")]
+        public int? PayPlan { get; set; }
+
         [Required]
-        [Display(Name = "Registration date")]
-        [DisplayFormat(DataFormatString = "{hh:mm - d MMM yyyy}")]
+        [Display(Name = "Data de registo")]
+        [DisplayFormat(DataFormatString = "{0:d MMM yyyy}")]
         public DateTime RegisterDate { get; set; }
+
+        [Display(Name = "Numero de telemóvel")]
+        public override String PhoneNumber { get; set; }
+
+        [Display(Name = "Username")]
+        public override String UserName { get; set; }
 
         //***************************************************************************
         //* Refers the relationship between VOTE and the USER
@@ -98,7 +107,6 @@ namespace Project.Models
         public virtual DbSet<Reply> Reply { get; set; }
         public virtual DbSet<Option> Option { get; set; }
         public virtual DbSet<Vote> Vote { get; set; }
-        public virtual DbSet<Choice> Choice { get; set; }
         //************************************************************************************************************************
 
         public static ApplicationDbContext Create()

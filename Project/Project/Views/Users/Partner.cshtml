@@ -1,0 +1,141 @@
+﻿@model IEnumerable<Project.Models.User>
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="row">
+            <div class="col-xs-6"><h2>Utilizadores</h2></div>
+            <div class="col-xs-6 text-right" style="padding-top:3%;padding-bottom:2%;">
+                <a href="@Url.Action("Options", "Users")" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span> Opções</a>
+            </div>
+            <div class="col-xs-12"><hr /></div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-4">
+        <ul class="nav nav-pills nav-stacked">
+            <li>@Html.ActionLink("Pendentes", "Pending", "Users", routeValues: null, htmlAttributes: new { @class = "btn btn-default" })</li>
+            <li>@Html.ActionLink("Associados", "Associated", "Users", routeValues: null, htmlAttributes: new { @class = "btn btn-default" })</li>
+            <li class="active">@Html.ActionLink("Sócios", "Partner", "Users", routeValues: null, htmlAttributes: new { @class = "btn btn-default" })</li>
+            <li>@Html.ActionLink("Colaboradores", "Collaborator", "Users", routeValues: null, htmlAttributes: new { @class = "btn btn-default" })</li>
+        </ul>
+        <hr />
+        @* LIST *@
+        <div style="max-height:465px;overflow-y:scroll;">
+            @foreach (var item in Model)
+            {
+                <a data-toggle="collapse" href="@string.Format("#user{0}",item.Id)" data-parent="#panelParent">
+                    <h5><span class="label label-default">@String.Format("{0:0000000}", item.Partner)</span> @Html.DisplayFor(model => item.Name)</h5>
+                </a>
+            }
+        </div>
+    </div>
+    @* PROFILES *@
+    <div class="col-xs-12 col-sm-6 col-md-8" id="panelParent">
+        @foreach (var item in Model)
+            {
+            <div class="panel panel-primary">
+                <div id="@string.Format("user{0}", item.Id)" class="panel-collapse collapse container-fluid">
+                    <div class="row">
+                        <div class="col-xs-12 text-right">
+                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="@string.Format("#promote{0}",item.Id)">Promover a Órgão Social</button>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.Name)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.Name)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.Partner)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@String.Format("{0:0000000}", item.Partner)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.DuePayday)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.DuePayday)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.PayPlan)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.PayPlan)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.RegisterDate)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.RegisterDate)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.Email)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.Email)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.PhoneNumber)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.PhoneNumber)</h5>
+                        </div>
+
+                        <div class="col-xs-12"><hr /></div>
+                        <div class="col-xs-12">
+                            @foreach (var log in item.Logs)
+                            {
+                                <div class="col-sm-12 col-md-8">
+                                    <p><b>@Html.DisplayFor(model => log.Hour)</b> : @Html.DisplayFor(model => log.Description)</p>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            @* Modal *@
+            <div class="modal fade" id="@string.Format("promote{0}",item.Id)" role="dialog" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button class="btn btn-danger pull-right" data-dismiss="modal">&times;</button>
+                            <h3 class="modal-title text-success">Promover a Sócio</h3>
+                        </div>
+                        <div class="modal-body row">
+                            @using (Html.BeginForm("PromoteToStaff", "Users", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                <label class="col-xs-2 col-xs-offset-1">Função:  </label>
+                                <div class="col-xs-9">
+                                    <label class="radio-inline"><input type="radio" name="role" value="collaborator" checked>Colaborador</label>
+                                    <label class="radio-inline"><input type="radio" name="role" value="admin">Administrador</label>
+                                </div>
+                                <div class="col-xs-12"><br /></div>
+                                @Html.Hidden(name: "userID", value: item.Id, htmlAttributes: new { @class = "center col-xs-12" })
+                                <input type="submit" value="Prosseguir" class="btn btn-success col-xs-4 col-xs-offset-4" />
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+

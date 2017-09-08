@@ -34,33 +34,32 @@ namespace Project.Models
         public string Email { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "A {0} deve conter pelo menos {2} caracteres.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Display(Name = "Confirmar password")]
+        [Compare("Password", ErrorMessage = "A password não coincide.")]
         public string ConfirmPassword { get; set; }
 
         // *****************************************************************
         // User data required for this system
         [Required]
-        [Display(Name = "First Name")]
+        [RegularExpression(@"[\w]+", ErrorMessage = "O {0} deve ter caracteres válidos")]
+        [Display(Name = "Nome")]
         public string Name { get; set; }
 
         [Required]
-        [Display(Name = "Last Name")]
+        [RegularExpression(@"[\w]+", ErrorMessage = "O {0} deve ter caracteres válidos")]
+        [Display(Name = "Apelido")]
         public string Nickname { get; set; }
 
         [Required]
-        [Display(Name = "Partner Number")]
-        public string Partner { get; set; }
-
-        [Required]
-        [StringLength(13, ErrorMessage = "You must enter a valid phone number", MinimumLength = 9)]
-        [Display(Name = "Phone")]
+        [Phone]
+        [StringLength(13, ErrorMessage = "Deve inserir um número válido", MinimumLength = 9)]
+        [Display(Name = "Telemóvel")]
         public string Phone { get; set; }
         //********************************************************************
     }

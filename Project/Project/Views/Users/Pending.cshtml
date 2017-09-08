@@ -1,0 +1,95 @@
+﻿@model IEnumerable<Project.Models.User>
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="row">
+            <div class="col-xs-6"><h2>Utilizadores</h2></div>
+            <div class="col-xs-6 text-right" style="padding-top:3%;padding-bottom:2%;">
+                <a href="@Url.Action("Options", "Users")" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span> Opções</a>
+            </div>
+            <div class="col-xs-12"><hr /></div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-4">
+        <ul class="nav nav-pills nav-stacked">
+            <li class="active">@Html.ActionLink("Pendentes", "Pending", "Users", routeValues: null, htmlAttributes: new { @class = "btn btn-default" })</li>
+            <li>@Html.ActionLink("Associados", "Associated", "Users", routeValues: null, htmlAttributes: new { @class = "btn btn-default" })</li>
+            <li>@Html.ActionLink("Sócios", "Partner", "Users", routeValues: null, htmlAttributes: new { @class = "btn btn-default" })</li>
+            <li>@Html.ActionLink("Colaboradores", "Collaborator", "Users", routeValues: null, htmlAttributes: new { @class = "btn btn-default" })</li>
+        </ul>
+        <hr />
+        @* LIST *@
+        <div style="max-height:700px;overflow-y:scroll;">
+            @foreach (var item in Model)
+            {
+                <a data-toggle="collapse" href="@string.Format("#user{0}",item.Id)" data-parent="#panelParent">
+                    <h5><span class="label label-default">@Html.DisplayFor(model => item.RegisterDate)</span> @Html.DisplayFor(model => item.Name)</h5>
+                </a>
+            }
+        </div>
+    </div>
+    @* PROFILES *@
+    <div class="col-xs-12 col-sm-6 col-md-8" id="panelParent">
+        @foreach (var item in Model)
+            {
+            <div class="panel panel-primary">
+                <div id="@string.Format("user{0}", item.Id)" class="panel-collapse collapse container-fluid">
+                    <div class="row">
+                        <div class="col-xs-12 text-right">
+                            @using (Html.BeginForm("PromoteToAssociated", "Users", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden(name: "userID", value: item.Id, htmlAttributes: new { @class = "center" })
+                                <input type="submit" value="Aceitar registo" class="btn btn-success" />
+                            }
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.Name)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.Name)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.RegisterDate)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.RegisterDate)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.Email)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.Email)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.PhoneNumber)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.PhoneNumber)</h5>
+                        </div>
+
+                        <div class="col-xs-12"><hr /></div>
+                        <div class="col-xs-12">
+                            @foreach (var log in item.Logs)
+                            {
+                                <div class="col-sm-12 col-md-8">
+                                    <p><b>@Html.DisplayFor(model => log.Hour)</b> : @Html.DisplayFor(model => log.Description)</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+    </div>
+
+</div>

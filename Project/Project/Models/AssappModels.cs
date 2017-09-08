@@ -24,13 +24,13 @@ namespace Project.Models
         [Required]
         public String Description { get; set; }
         
-        [DisplayFormat(DataFormatString = "{hh:mm:ss - d MMM yyyy}")]
+        [DisplayFormat(DataFormatString = "{0:hh:mm - d MMM yyyy}")]
         public DateTime Hour { get; set; }
 
         //******************************************************************************************
         //*********************    Foreign Keys definition      ************************************
 
-        public User User { get; set; } // associates in C# the USER with the ACTION
+        public virtual User User { get; set; } // associates in C# the USER with the ACTION
         [Required]
         [ForeignKey("User")]
         public String UserFK { get; set; } // associates in SQL the USER with the ACTION
@@ -60,11 +60,9 @@ namespace Project.Models
         [DefaultValue(null)]
         public String Image { get; set; }
 
+        [MaxLength]
         [DefaultValue(null)]
         public String Description { get; set; }
-
-        [Required]
-        public String Summary { get; set; }
 
         [DefaultValue(false)]
         public Boolean Accepted { get; set; }
@@ -75,16 +73,16 @@ namespace Project.Models
         //******************************************************************************************
         //*********************    Foreign Keys definition      ************************************
 
-        public User User { get; set; } // associates in C# the USER with the PUBLICATION
+        public virtual User User { get; set; } // associates in C# the USER with the PUBLICATION
         [Required]
         [ForeignKey("User")]
         public String UserFK { get; set; } // associates in SQL the USER with the PUBLICATION
 
-        public Poll Poll { get; set; } // associates in C# the PUBLICATION with the POLL
+        public virtual Poll Poll { get; set; } // associates in C# the PUBLICATION with the POLL
         [ForeignKey("Poll")]
         public int? PollFK { get; set; } // associates in SQL the PUBLICATION with the POLL
 
-        public Event Event { get; set; } // associates in C# the PUBLICATION with the EVENT
+        public virtual Event Event { get; set; } // associates in C# the PUBLICATION with the EVENT
         [ForeignKey("Event")]
         public int? EventFK { get; set; } // associates in SQL the PUBLICATION with the EVENT
 
@@ -99,15 +97,47 @@ namespace Project.Models
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////               REPLY               ///////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    public class Reply
+    {
+        public Reply()
+        {
+            Hour = DateTime.Now;
+        }
+
+        [Key]
+        public int ID { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:dd MMM yyyy - hh:mm}")]
+        public DateTime Hour { get; set; }
+
+        [Required]
+        public String Content { get; set; }
+
+        [DefaultValue(true)]
+        public Boolean IsVisible { get; set; }
+
+        //*********************************************************************************************
+        //*********************    Foreign Keys definition      ***************************************
+
+        public virtual Publication Publication { get; set; } // associates in C# the PUBLICATION with the REPLY
+        [ForeignKey("Publication")]
+        public int PublicationFK { get; set; } // associates in SQL the PUBLICATION with the REPLY
+
+        public virtual User User { get; set; } // associates in C# the USER with the REPLY
+        [ForeignKey("User")]
+        public String UserFK { get; set; } // associates in SQL the USER with the REPLY
+
+        //*********************   END Foreign Keys definition    *************************************
+        //********************************************************************************************
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////               EVENT               ///////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////
     public class Event
     {
-        public Event()
-        {
-            Publications = new HashSet<Publication>();
-        }
-
         [Key]
         public int ID { get; set; }
 
@@ -117,12 +147,7 @@ namespace Project.Models
 
         [Required]
         public String Local { get; set; }
-
-        //*****************************************************************************************
-        //* Refers the relationship between EVENT and the PUBLICATION
-        //* A EVENT may have multiple PUBLICATION   
-        public virtual ICollection<Publication> Publications { get; set; }
-        //*****************************************************************************************
+        
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,9 +158,7 @@ namespace Project.Models
         // Construtor
         public Poll()
         {
-            Votes = new HashSet<Vote>();
-            Publications = new HashSet<Publication>();
-            Choices = new HashSet<Choice>();
+            Options = new HashSet<Option>();
         }
 
         [Key]
@@ -150,57 +173,17 @@ namespace Project.Models
         [DefaultValue(false)]
         public Boolean IsVisible { get; set; }
 
+        [DefaultValue(false)]
+        public Boolean IsInclusive { get; set; }
+
         [DefaultValue(null)]
         public String LinkToForm { get; set; }
 
         //*******************************************************************************************
-        //* Refers the relationship between POOL and the VOTE
-        //* A POLL may have multiple VOTE   
-        public virtual ICollection<Vote> Votes { get; set; }
-        //* Refers the relationship between POOL and the PUBLICATION
-        //* A POLL may have multiple PUBLICATION   
-        public virtual ICollection<Publication> Publications { get; set; }
-        //* Refers the relationship between POOL and the PUBLICATION
-        //* A POLL may have multiple CHOICES
-        public virtual ICollection<Choice> Choices { get; set; }
+        //* Refers the relationship between POOL and the OPTION
+        //* A POLL may have multiple OPTION
+        public virtual ICollection<Option> Options { get; set; }
         //*******************************************************************************************
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////////////////               REPLY               ///////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    public class Reply
-    {
-        public Reply()
-        {
-            Hour = DateTime.Now;
-        }
-
-        [Key]
-        public int ID { get; set; }
-        
-        [DisplayFormat(DataFormatString = "{hh:mm:ss - d MMM yyyy}")]
-        public DateTime Hour { get; set; }
-
-        [Required]
-        public String Content { get; set; }
-
-        [DefaultValue(true)]
-        public Boolean IsVisible { get; set; }
-
-        //*********************************************************************************************
-        //*********************    Foreign Keys definition      ***************************************
-
-        public Publication Publication { get; set; } // associates in C# the PUBLICATION with the REPLY
-        [ForeignKey("Publication")]
-        public int PublicationFK { get; set; } // associates in SQL the PUBLICATION with the REPLY
-
-        public User User { get; set; } // associates in C# the USER with the REPLY
-        [ForeignKey("User")]
-        public String UserFK { get; set; } // associates in SQL the USER with the REPLY
-
-        //*********************   END Foreign Keys definition    *************************************
-        //********************************************************************************************
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,7 +195,6 @@ namespace Project.Models
         public Option()
         {
             Votes = new HashSet<Vote>();
-            Choices = new HashSet<Choice>();
         }
 
         [Key]
@@ -221,13 +203,22 @@ namespace Project.Models
         [Required]
         public String Name { get; set; }
 
+        public int Count { get; set; }
+
+        //*****************************************************************************************
+        //*********************    Foreign Keys definition      ***********************************
+
+        public virtual Poll Poll { get; set; } // associates in C# the OPTION with the POLL
+        [ForeignKey("Poll")]
+        public int PollFK { get; set; } // associates in SQL the OPTION with the POLL
+
+        //*********************   END Foreign Keys definition    *********************************
+        //****************************************************************************************
+
         //*****************************************************************************************
         //* Refers the relationship between OPTION and the VOTE
         //* A OPTION may have multiple VOTE   
         public virtual ICollection<Vote> Votes { get; set; }
-        //* Refers the relationship between OPTION and the VOTE
-        //* A OPTION may have multiple CHOICES 
-        public virtual ICollection<Choice> Choices { get; set; }
         //*****************************************************************************************
     }
 
@@ -239,41 +230,15 @@ namespace Project.Models
         //*****************************************************************************************
         //*********************    Foreign Keys definition      ***********************************
 
-        public User User { get; set; } // associates in C# the USER with the VOTE
+        public virtual User User { get; set; } // associates in C# the USER with the VOTE
         [Column(Order = 0), Key, ForeignKey("User")]
         public String UserFK { get; set; } // associates in SQL the VOTE with the USER
 
-        public Poll Poll { get; set; } // associates in C# the VOTE with the POLL
-        [Column(Order = 1), Key, ForeignKey("Poll")]
-        public int PollFK { get; set; } // associates in SQL the VOTE with the POLL
-
         public virtual Option Option { get; set; } // associates in C# the VOTE with the OPTION
-        [Required]
-        [ForeignKey("Option")]
+        [Column(Order = 1), Key, ForeignKey("Option")]
         public int OptionFK { get; set; } // associates in SQL the VOTE with the OPTION
 
         //*********************   END Foreign Keys definition    *********************************
         //****************************************************************************************
-
-    }
-
-    public class Choice
-    {
-        //*****************************************************************************************
-        //*********************    Foreign Keys definition      ***********************************
-
-        public Poll Poll { get; set; } // associates in C# the CHOICE with the POLL
-        [Column(Order = 0), Key, ForeignKey("Poll")]
-        public int PollFK { get; set; } // associates in SQL the CHOICE with the POLL
-
-        public virtual Option Option { get; set; } // associates in C# the CHOICE with the OPTION
-        [Column(Order = 1), Key, ForeignKey("Option")]
-        public int OptionFK { get; set; } // associates in SQL the CHOICE with the OPTION
-
-        //*********************   END Foreign Keys definition    *********************************
-        //****************************************************************************************
-
-        [DefaultValue(0)]
-        public int Count { get; set; }
     }
 }
