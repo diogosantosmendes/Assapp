@@ -3,7 +3,7 @@
     var board = document.getElementById(id);
     var ctx = board.getContext("2d");
     var colors = ["#DC143C", "#1E90FF", "#3CB371", "#DAA520", "#F079B9", "#808000", "#DA39A3", "#FF7F50", "#808080", "#20B2AA"];
-    var i, sum = 0 , pointer = 0;
+    var i, sum = 0, pointer = 0;
     var xC = 100, yC = 100, r = 70;
     var xR = 240, yR = 15;
 
@@ -25,7 +25,7 @@
             ctx.fillRect(xR, yR, 10, 10);
             ctx.stroke();
             ctx.fillStyle = "#000000";
-            ctx.fillText(Math.round(obj[i].value * 100 / sum)+"%", xR-40, yR + 10);
+            ctx.fillText(Math.round(obj[i].value * 100 / sum) + "%", xR - 40, yR + 10);
             ctx.fillText(obj[i].name, xR + 15, yR + 10);
             yR += 17;
         }
@@ -50,7 +50,7 @@ function commentSuccess(data) {
         var discussion = document.createElement("DIV");
         discussion.setAttribute("class", "row container-fluid");
         var header = document.createElement("DIV");
-        header.setAttribute("class", "col-sm-2 col-sm-offset-3 text-right");
+        header.setAttribute("class", "col-sm-2 text-right");
         var hour = document.createElement("SPAN");
         hour.setAttribute("class", "label label-default");
         hour.innerHTML = data.hour;
@@ -60,7 +60,7 @@ function commentSuccess(data) {
         header.appendChild(user);
         discussion.appendChild(header);
         var text = document.createElement("DIV");
-        text.setAttribute("class", "col-sm-7");
+        text.setAttribute("class", "col-sm-9");
         var textArea = document.getElementById("commentTextArea");
         var content = document.createElement("H6");
         content.innerHTML = textArea.value;
@@ -104,6 +104,7 @@ function closeSuccess(data) {
 
 var loadFile = function (event) {
     var output = document.getElementById('imgPreview');
+    output.hidden = false;
     output.src = URL.createObjectURL(event.target.files[0]);
 };
 
@@ -132,31 +133,33 @@ function addOption() {
     }
 }
 
-function previewBuild() {
-    var titleEx = document.getElementById("titlePreview");
-    titleEx.innerHTML = document.getElementById("Name").value;
-    if (document.getElementById("IsEvent").checked) {
-        var dayEx = document.getElementById("dayPreview");
-        dayEx.innerHTML = '<span class="glyphicon glyphicon-calendar"></span> ' + document.getElementsByName("form_datetime").value;
-        var localEx = document.getElementById("localPreview");
-        localEx.innerHTML = '<span class="glyphicon glyphicon-map-marker"></span> ' + document.getElementById("Local").value;
-    }
-    if (document.getElementById("IsPoll").checked) {
-        var i, input = "", obj = [];
-        var matterEx = document.getElementById("matterPreview");
-        matterEx.innerHTML = '<span class="glyphicon glyphicon-edit"></span> ' + document.getElementById("Matter").value;
-        var linktoformEx = document.getElementById("linktoformPreview");
-        linktoformEx.innerHTML = document.getElementById("LinkToForm").value !== null ? '<span class="glyphicon glyphicon-arrow-right"></span><label class="h5"><a href=" ' + document.getElementById("LinkToForm").value + '" target="_blank"> Form</a></label>' : "";
-        var optionsIn = document.getElementsByClassName("optionsToPreview");
-        for (i = 0; i < optionsIn.length; i++) {
-            input += optionsIn[i].value + ' - <input type="radio"><br />';
-            obj.push({ value: i % 20 + 10, name: optionsIn[i].value });
+function logSucess(data) {
+    var msg;
+    if (data.result) {
+        var container = document.getElementById("log" + data.user);
+        container.innerHTML = "";
+        var text = "";
+        for (var i = 0; i < data.logs.length; i++) {
+            var parag = document.createElement("p");
+            var bold = document.createElement("b");
+            bold.innerText = data.logs[i].Hour;
+            var label = document.createElement("label");
+            label.innerText = " : " + data.logs[i].Description;
+            parag.appendChild(bold);
+            parag.appendChild(label);
+            var div = document.createElement("div");
+            div.appendChild(parag);
+            container.appendChild(div);
         }
-        input += '<br /><button class="btn btn-default">Vote</button>';
-        var optionsEx = document.getElementById("optionsPreview");
-        optionsEx.innerHTML = input;
-        donutChart("canvasToTest", obj);
+        if (data.hasmore) {
+            document.getElementById("right" + data.user).innerHTML = '<a data-ajax="true" data-ajax-method="Get" data-ajax-success="logSucess" href="/Users/Log?userID=' + data.user + '&page=' + (data.page + 1) + '" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right" aria-label="Right Align" aria-hidden="true"></span></a>';
+        }
+        if (data.page!=0) {
+            document.getElementById("left" + data.user).innerHTML = '<a data-ajax="true" data-ajax-method="Get" data-ajax-success="logSucess" href="/Users/Log?userID=' + data.user + '&page=' + (data.page - 1) + '" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left" aria-label="Right Align" aria-hidden="true"></span></a>';
+        }
+    } else {
+        msg = document.getElementById("errorText");
+        msg.innerHTML = data.msg;
+        $('#errorAlert').modal('toggle');
     }
-    var descriptionEx = document.getElementById("descriptionPreview");
-    descriptionEx.innerHTML = document.getElementById("Description").value;
 }

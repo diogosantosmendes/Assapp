@@ -59,7 +59,7 @@ namespace Project.Models
         public virtual ICollection<Publication> Publications { get; set; }
         //* Refers the relationship between USER and the LOG
         //* A USER may have multiple LOG
-        public virtual ICollection<Log> Logs { get; set; }
+        public ICollection<Log> Logs { get; set; }
         //* Refers the relationship between USER and the REPLY
         //* A USER may have multiple REPLY
         public virtual ICollection<Reply> Replies { get; set; }

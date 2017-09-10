@@ -62,7 +62,7 @@
                     <img src="~/fonts/@Url.Content(Model.Image)" class="img-thumbnail" style="max-height:400px;float: left;margin-right: 20px;" />
                 }
                 @* Description *@
-                @Html.DisplayFor(model => Model.Description)
+                @Html.Raw(Model.Description)
             </div>
 
             @* Poll *@
@@ -197,19 +197,19 @@
                                 </div>
                             }
                         }
-                        <br />
-                        @* Coment *@
-                        @using (Ajax.BeginForm("Comment", "Publications", new AjaxOptions { HttpMethod = "Post", OnSuccess = "commentSuccess" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            <div class="text-center">
-                                @Html.TextArea(name: "Text", htmlAttributes: new { @id = "commentTextArea", @style = "width:100%; border:2px solid royalblue; border-radius: 5px;" })
-                                @Html.Hidden(name: "PublicationID", value: Model.ID)
-                                @Html.Hidden(name: "PublicationName", value: Model.Name)
-                                <input type="submit" value="Comentar" class="btn btn-default" />
-                            </div>
-                        }
                     </div>
+                    <br />
+                    @* Coment *@
+                    @using (Ajax.BeginForm("Comment", "Publications", new AjaxOptions { HttpMethod = "Post", OnSuccess = "commentSuccess" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="text-center">
+                            @Html.TextArea(name: "Text", htmlAttributes: new { @id = "commentTextArea", @style = "width:100%; border:2px solid royalblue; border-radius: 5px;" })
+                            @Html.Hidden(name: "PublicationID", value: Model.ID)
+                            @Html.Hidden(name: "PublicationName", value: Model.Name)
+                            <input type="submit" value="Comentar" class="btn btn-default" />
+                        </div>
+                    }
                 </div>
             </div>
             <div class="col-xs-12"><br /></div>

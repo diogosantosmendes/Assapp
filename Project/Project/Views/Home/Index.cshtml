@@ -1,4 +1,83 @@
-﻿@{
+﻿@model Project.Models.HomeIndexViewModel
+
+@{
     ViewBag.Title = "Home Page";
 }
 
+<div class="text-right">
+    <a href="@Url.Action("Options", "Users")" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span> Editar</a>
+</div>
+<br />
+
+<div style="width:100%"><img src="~/fonts/@Url.Content(Model.Image)" class="img-responsive" /></div>
+<br />
+
+<div class="jumbotron">
+    <h1>@Html.DisplayFor(model => Model.Name)</h1>
+    @if (Model.AboutUs != null)
+    {
+        <br />
+        <div class="alert alert-info text-center">
+            <h3><strong>Sobre nós</strong></h3>
+            <h5>@Html.DisplayFor(model => Model.AboutUs)</h5>
+        </div>
+    }
+</div>
+<hr />
+
+@if (Model.WhoWeAre != null)
+{
+    <div>
+        <br />
+        <div class="well well-sm" style="position:relative">
+            <h3 class="text-center"><strong>Quem somos</strong></h3>
+            <img src="~/fonts/@Url.Content(Model.TeamPhoto)" style="max-height:400px;float: left;margin-right: 20px;" class="img-responsive" />
+            <br />
+            <p class="text-justify h5 container" style="padding-right:60px;">@Html.DisplayFor(model => Model.WhoWeAre)</p>
+            <br />
+        </div>
+    </div>
+}
+
+@if (Model.Mission != null)
+{
+    <br />
+    <div class="alert alert-info">
+        <h3 class="text-center"><strong>Missão</strong></h3>
+        <br />
+        <h5 class="">@Html.DisplayFor(model => Model.Mission)</h5>
+        <button class="pull-right btn btn-default" data-toggle="modal" data-target="#document">Regulamento</button>
+        <br />
+    </div>
+}
+
+@if (Model.Location_Lon != null && Model.Location_Lat != null)
+{
+    <hr />
+    <h3 class="text-center"><strong>Onde nos encontrar</strong></h3>
+    <div id="map" style="height:400px;width:100%;"></div>
+    <script>
+    function initMap() {
+        var location = new google.maps.LatLng(@(Model.Location_Lat), @(Model.Location_Lon));
+        var mapProp = { center: location, zoom: 15, mapTypeId: 'roadmap' };
+        var map = new google.maps.Map(document.getElementById("map"), mapProp);
+        var marker = new google.maps.Marker({ position: location });
+        marker.setMap(map);
+    }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAF2mT0wy3zICKhNKgJdKbOQz5BRvMrfbY&callback=initMap"></script>
+}
+
+<!-- Modal -->
+<div class="modal fade" id="document" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <iframe src="~/fonts/@Url.Content(Model.Regulation)" style="width:100%;height:700px" />
+            </div>
+        </div>
+    </div>
+</div>

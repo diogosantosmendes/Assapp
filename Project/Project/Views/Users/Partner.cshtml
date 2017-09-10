@@ -98,12 +98,13 @@
 
                         <div class="col-xs-12"><hr /></div>
                         <div class="col-xs-12">
-                            @foreach (var log in item.Logs)
-                            {
-                                <div class="col-sm-12 col-md-8">
-                                    <p><b>@Html.DisplayFor(model => log.Hour)</b> : @Html.DisplayFor(model => log.Description)</p>
-                                </div>
-                            }
+                            @Ajax.ActionLink("Actividade", "Log", new { userID = item.Id, page = 0 }, new AjaxOptions { HttpMethod = "Get", OnSuccess = "logSucess" }, new { @class = "btn btn-primary center-block h4" })
+                            <br />
+                            <div id="log@(item.Id)"></div>
+                            <div class="row">
+                                <div id="left@(item.Id)" class="col-xs-6 text-right"></div>
+                                <div id="right@(item.Id)" class="col-xs-6"></div>
+                            </div>
                         </div>
 
                     </div>

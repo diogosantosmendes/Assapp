@@ -4,30 +4,37 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Project.Models
 {
-    public class PublicationIndexViewModel
+    public class PublicationListViewModel
     {
-        public PublicationIndexViewModel()
+        public PublicationListViewModel()
         {
             List = new List<Publication>();
+            Header = new List<Publication>();
         }
 
         public int Index { get; set; }
         public Boolean HaveMore { get; set; }
         public Boolean HaveLess { get; set; }
         public List<Publication> List { get; set; }
+        public List<Publication> Header { get; set; }
     }
 
     public class PublicationCreateViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "O Título é um campo obrigatório")]
         [DisplayName("Titulo")]
         public String Name { get; set; }
+        
+        [DisplayName("Resumo")]
+        public String Resume { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "A Descrição é um campo obrigatório")]
         [DisplayName("Descrição")]
+        [AllowHtml]
         public String Description { get; set; }
 
         [DefaultValue(false)]
@@ -67,6 +74,7 @@ namespace Project.Models
     {
         public int ID { get; set; }
         
+        [Required(ErrorMessage = "O Título é um campo obrigatório")]
         [DisplayName("Titulo")]
         public String Name { get; set; }
 
@@ -74,8 +82,12 @@ namespace Project.Models
         [DefaultValue(null)]
         public String Image { get; set; }
 
-        [Required]
+        [DisplayName("Resumo")]
+        public String Resume { get; set; }
+
+        [Required(ErrorMessage = "A Descrição é um campo obrigatório")]
         [DisplayName("Descrição")]
+        [AllowHtml]
         public String Description { get; set; }
 
         [DefaultValue(false)]

@@ -1,5 +1,6 @@
 ﻿@model Project.Models.PublicationEditViewModel
 
+<script src="@Url.Content("~/Scripts/tinymce/tinymce.min.js")"></script>
 
 @using (Html.BeginForm("Edit", "Publications", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
@@ -48,9 +49,20 @@
                             }
                             else
                             {
-                                <img class="img-thumbnail" style="max-height:400px;" id="imgPreview" src="" />
+                                <img class="img-responsive" style="max-height:400px;" id="imgPreview" src="" hidden />
                             }
                             @Html.TextBox("file", "", new { type = "file", onchange = "loadFile(event)" })
+                        </div>
+                    </div>
+                </div>
+
+                @* Resume *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.Resume, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextAreaFor(model => model.Resume, new { @class = "form-control", style = "height:200px" })
+                            @Html.ValidationMessageFor(model => model.Resume, "", new { @class = "text-danger" })
                         </div>
                     </div>
                 </div>
@@ -60,11 +72,21 @@
                     <div class="row">
                         @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
                         <div class="col-md-9">
-                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", style = "height:300px" })
+                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @id= "richtext", style = "height:400px" })
                             @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
                         </div>
                     </div>
                 </div>
+                <script>
+                    tinymce.init({
+                        selector: '#richtext',
+                        statusbar: false,
+                        menubar: false,
+                        toolbar: 'fontselect fontsizeselect | bold italic underline | subscript superscript | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist | hr table link charmap | print preview',
+                        plugins: 'link colorpicker textcolor print lists preview hr table charmap',
+                        skin: 'lightgray'
+                    });
+                </script>
 
                 @* EVENT *@
                 <div class="col-xs-12">

@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
+using Newtonsoft.Json;
 using Project.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -54,7 +57,7 @@ namespace Project.Controllers
             foreach (var userRole in new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db)).Roles.Single(x => x.Name.Equals("partner")).Users)
             {
                 var user = UserManager.FindById(userRole.UserId);
-                if (!UserManager.IsInRole(user.Id,"collaborator") && user.PayPlan==payPlan)
+                if (!UserManager.IsInRole(user.Id, "collaborator") && user.PayPlan == payPlan)
                 {
                     var remove = await UserManager.RemoveFromRoleAsync(user.Id, "partner");
                     if (remove.Succeeded)
@@ -87,7 +90,7 @@ namespace Project.Controllers
                     }
                 }
             }
-            
+
             var add = await UserManager.AddToRoleAsync(userID, "collaborator");
             if (add.Succeeded)
             {
@@ -109,12 +112,12 @@ namespace Project.Controllers
                 .Users;
 
             List<User> users = new List<User>();
-            
+
             foreach (var userRole in usersRole)
             {
                 users.Add(UserManager.FindById(userRole.UserId));
             }
-            
+
             var ordered = users.OrderBy(x => x.Name).ToList();
 
             return View(ordered);
@@ -123,11 +126,11 @@ namespace Project.Controllers
         // GET: Users/Partner
         public ActionResult Partner()
         {
-            var usersRole= new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db))
+            var usersRole = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db))
                 .Roles.Single(x => x.Name.Equals("partner"))
                 .Users;
 
-            List<User> users = new List<User>(); 
+            List<User> users = new List<User>();
 
             foreach (var userRole in usersRole)
             {
@@ -211,7 +214,7 @@ namespace Project.Controllers
                     Log(String.Format("Foi destituido de colaborador do sistema pelo atual administrador {0}", UserManager.FindById(User.Identity.GetUserId()).Name), userID);
                 }
             }
-            
+
             return RedirectToAction("Collaborator");
         }
 
@@ -225,7 +228,7 @@ namespace Project.Controllers
             user.PayPlan = payPlan;
             if (user.Partner == null)
             {
-                user.Partner = partner==0 ? db.Users.Max(x => x.Partner) + 1 : partner;
+                user.Partner = partner == 0 ? db.Users.Max(x => x.Partner) + 1 : partner;
             }
             var update = await UserManager.UpdateAsync(user);
             if (update.Succeeded)
@@ -254,6 +257,37 @@ namespace Project.Controllers
                 }
             }
             return RedirectToAction("Pending");
+        }
+
+        // GET: Users/Log
+        [HttpGet]
+        public JsonResult Log(string userID, int page)
+        {
+            try
+            {
+                var logs = db.Log.Where(x => x.UserFK == userID).ToList();
+                var toSend = db.Log.Where(x => x.UserFK == userID)
+                    .OrderByDescending(x => x.Hour)
+                    .Skip(page * 20)
+                    .Take(20)
+                    .Select(x=>new { Hour=x.Hour.ToString(), x.Description });
+                var hasmore = logs.Count() > (page * 20 + 20) ? true : false;
+                if (toSend.Count() > 0)
+                {
+                    return Json(new { result = true, logs = toSend, page = page, hasmore = hasmore, user = userID }, JsonRequestBehavior.AllowGet);
+                }
+                if (page == 0)
+                {
+                    return Json(new { result = false, msg = "Não foram encontradas ações do utilizador." }, JsonRequestBehavior.AllowGet);
+                }
+                return Json(new { result = false, msg = "A página excedeu o limite de ações do utilizador." }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+                return Json(new { result = false, msg = "Ocorreu um erro, não foi possível encontrar ações do utilizador. Por favor tente mais tarde." }, JsonRequestBehavior.AllowGet);
+            }
+
         }
 
         private void Log(String content, String userID)

@@ -19,17 +19,49 @@ namespace Project.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Publications
-        public ActionResult Index(int? i)
+        public ActionResult Index()
         {
-            int index = i ?? default(int);
-            PublicationIndexViewModel list = new PublicationIndexViewModel
+            try
             {
-                Index = index,
-                HaveMore = db.Publication.Count() > (index + 8) ? true : false,
-                HaveLess = index == 0 ? false : true,
-                List = db.Publication.Where(x => x.Accepted).OrderByDescending(p => p.CreatedIn).Skip(index).Take(8).ToList()
-            };
-            return View(list);
+                PublicationListViewModel list = new PublicationListViewModel
+                {
+                    Index = -1,
+                    HaveMore = db.Publication.Count() > 6 ? true : false,
+                    HaveLess = false,
+                    List = db.Publication.Where(x => x.Accepted).OrderByDescending(p => p.CreatedIn).Take(6).ToList(),
+                    Header = db.Publication.Where(x => x.Accepted && x.Image != null).OrderByDescending(p => p.CreatedIn).Take(4).ToList()
+                };
+                return View(list);
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex);
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        // GET: Publications
+        public ActionResult Page(int i)
+        {
+            try
+            {
+                if (i == -1) return RedirectToAction("Index");
+                int flag = i * 9 + 6;
+                PublicationListViewModel list = new PublicationListViewModel
+                {
+                    Index = i,
+                    HaveMore = db.Publication.Count() > (flag + 9) ? true : false,
+                    HaveLess = true,
+                    List = db.Publication.Where(x => x.Accepted).OrderByDescending(p => p.CreatedIn).Skip(flag).Take(flag + 9).ToList(),
+                    Header = null
+                };
+                return View("Index", list);
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex);
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         // GET: Publications/Profile
@@ -61,6 +93,7 @@ namespace Project.Controllers
                 option.Count++;
                 db.Entry(option).State = EntityState.Modified;
                 db.SaveChanges();
+                Log(String.Format("Votou no questionário: {0}", db.Poll.Find(pollID).Matter));
                 return Json(new { result = true, msg = "Voto inserido com sucesso." });
             }
             else
@@ -159,7 +192,7 @@ namespace Project.Controllers
         {
             if (ModelState.IsValid)
             {
-                Publication publication = new Publication { CreatedIn = DateTime.Now, Description = form.Description, Name = form.Name, Accepted=false, UserFK=User.Identity.GetUserId()};
+                Publication publication = new Publication { CreatedIn = DateTime.Now, Description = form.Description, Name = form.Name, Accepted = false, UserFK = User.Identity.GetUserId() };
 
                 if (form.IsEvent)
                 {
@@ -174,7 +207,7 @@ namespace Project.Controllers
                     Poll p = new Poll { Matter = form.Matter, IsFinished = false, IsInclusive = form.IsInclusive, IsVisible = form.IsVisible, LinkToForm = form.LinkToForm };
                     db.Poll.Add(p);
                     db.SaveChanges();
-                    foreach(String option in form.OptionName)
+                    foreach (String option in form.OptionName)
                     {
                         Option o = new Option { Name = option, Poll = p, Count = 0 };
                         db.Option.Add(o);
@@ -182,10 +215,10 @@ namespace Project.Controllers
                     }
                     publication.Poll = p;
                 }
-                
+
                 if (file != null && file.ContentLength > 0)
                 {
-                    var fileName = Guid.NewGuid().ToString()+Path.GetExtension(file.FileName);
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     var path = Path.Combine(Server.MapPath("~/fonts"), fileName);
                     file.SaveAs(path);
                     publication.Image = fileName;
@@ -227,9 +260,9 @@ namespace Project.Controllers
                 IsVisible = publication.PollFK != null ? publication.Poll.IsVisible : false,
                 IsInclusive = publication.PollFK != null ? publication.Poll.IsInclusive : false,
                 LinkToForm = publication.PollFK != null ? publication.Poll.LinkToForm : null,
-                OptionName = publication.PollFK != null ? publication.Poll.Options.Select(z=>z.Name).ToArray(): new List<String>().ToArray()
+                OptionName = publication.PollFK != null ? publication.Poll.Options.Select(z => z.Name).ToArray() : new List<String>().ToArray()
             };
-            
+
             return View(viewModel);
         }
 
@@ -245,7 +278,7 @@ namespace Project.Controllers
                 publication.Name = form.Name;
                 publication.Description = form.Description;
 
-                if (publication.EventFK!=null)
+                if (publication.EventFK != null)
                 {
                     if (form.IsEvent)
                     {
@@ -304,7 +337,7 @@ namespace Project.Controllers
                         publication.Poll = p;
                     }
                 }
-                
+
 
                 if (file != null && file.ContentLength > 0)
                 {

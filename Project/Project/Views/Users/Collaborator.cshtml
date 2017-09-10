@@ -31,91 +31,90 @@
     </div>
     @* PROFILES *@
     <div class="col-xs-12 col-sm-6 col-md-8" id="panelParent">
-       @foreach (var item in Model)
+        @foreach (var item in Model)
             {
-        <div class="panel panel-primary">
-            <div id="@string.Format("user{0}", item.Id)" class="panel-collapse collapse container-fluid">
-                <div class="row">
+            <div class="panel panel-primary">
+                <div id="user@(item.Id)" class="panel-collapse collapse container-fluid">
+                    <div class="row">
 
-                    <div class="col-xs-12 text-right">
-                        @using (Html.BeginForm("Demote", "Users", FormMethod.Post))
-                        {
-                            @Html.AntiForgeryToken()
-                            @Html.Hidden(name: "UserID", value: item.Id, htmlAttributes: new { @class = "center" })
-                            <input type="submit" value="Despromover" class="btn btn-danger" />
-                        }
+                        <div class="col-xs-12 text-right">
+                            @using (Html.BeginForm("Demote", "Users", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden(name: "UserID", value: item.Id)
+                                <input type="submit" value="Despromover" class="btn btn-danger" />
+                            }
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.Name)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.Name)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.Partner)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@String.Format("{0:0000000}", item.Partner)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.DuePayday)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.DuePayday)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.PayPlan)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.PayPlan)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.RegisterDate)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.RegisterDate)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.Email)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.Email)</h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-4 text-right">
+                            <h5><small>@Html.DisplayNameFor(model => model.PhoneNumber)</small></h5>
+                        </div>
+
+                        <div class="col-sm-12 col-md-8">
+                            <h5>@Html.DisplayFor(model => item.PhoneNumber)</h5>
+                        </div>
+
+                        <div class="col-xs-12"><hr /></div>
+                        <div class="col-xs-12">
+                            @Ajax.ActionLink("Actividade", "Log", new { userID = item.Id, page = 0 }, new AjaxOptions { HttpMethod = "Get", OnSuccess = "logSucess" }, new { @class= "btn btn-primary center-block h4" })
+                            <br />    
+                            <div id="log@(item.Id)"></div>
+                                <div class="row">
+                                    <div id="left@(item.Id)" class="col-xs-6 text-right"></div>
+                                    <div id="right@(item.Id)" class="col-xs-6"></div>
+                                </div>
+                        </div>
                     </div>
-
-                    <div class="col-sm-12 col-md-4 text-right">
-                        <h5><small>@Html.DisplayNameFor(model => model.Name)</small></h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-8">
-                        <h5>@Html.DisplayFor(model => item.Name)</h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-4 text-right">
-                        <h5><small>@Html.DisplayNameFor(model => model.Partner)</small></h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-8">
-                        <h5>@String.Format("{0:0000000}", item.Partner)</h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-4 text-right">
-                        <h5><small>@Html.DisplayNameFor(model => model.DuePayday)</small></h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-8">
-                        <h5>@Html.DisplayFor(model => item.DuePayday)</h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-4 text-right">
-                        <h5><small>@Html.DisplayNameFor(model => model.PayPlan)</small></h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-8">
-                        <h5>@Html.DisplayFor(model => item.PayPlan)</h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-4 text-right">
-                        <h5><small>@Html.DisplayNameFor(model => model.RegisterDate)</small></h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-8">
-                        <h5>@Html.DisplayFor(model => item.RegisterDate)</h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-4 text-right">
-                        <h5><small>@Html.DisplayNameFor(model => model.Email)</small></h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-8">
-                        <h5>@Html.DisplayFor(model => item.Email)</h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-4 text-right">
-                        <h5><small>@Html.DisplayNameFor(model => model.PhoneNumber)</small></h5>
-                    </div>
-
-                    <div class="col-sm-12 col-md-8">
-                        <h5>@Html.DisplayFor(model => item.PhoneNumber)</h5>
-                    </div>
-
-                    <div class="col-xs-12"><hr /></div>
-                    <div class="col-xs-12">
-                        @foreach (var log in item.Logs)
-                        {
-                            <div class="col-sm-12 col-md-8">
-                                <p><b>@Html.DisplayFor(model => log.Hour)</b> : @Html.DisplayFor(model => log.Description)</p>
-                            </div>
-                        }
-                    </div>
-
                 </div>
             </div>
-        </div>
-       }
+                                }
     </div>
-
 </div>

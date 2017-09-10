@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace Project.Models
 {
@@ -62,6 +63,11 @@ namespace Project.Models
 
         [MaxLength]
         [DefaultValue(null)]
+        public String Resume { get; set; }
+
+        [MaxLength]
+        [DefaultValue(null)]
+        [AllowHtml]
         public String Description { get; set; }
 
         [DefaultValue(false)]
