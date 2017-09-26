@@ -405,6 +405,8 @@
     <Content Include="Scripts\tinymce\skins\lightgray\fonts\tinymce-small.eot" />
     <Content Include="Scripts\tinymce\langs\readme.md" />
     <Content Include="Views\Shared\_NotificationsPartial.cshtml" />
+    <Content Include="Views\Manage\EditAccount.cshtml" />
+    <Content Include="Views\Home\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

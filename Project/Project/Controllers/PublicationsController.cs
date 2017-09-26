@@ -74,6 +74,7 @@ namespace Project.Controllers
 
 
         // GET: Publications/Unaccepted
+        [Authorize(Roles = "admin")]
         public ActionResult Unaccepted()
         {
             return View(db.Publication.Where(x => !x.Accepted).OrderByDescending(p => p.CreatedIn).ToList());
@@ -84,27 +85,36 @@ namespace Project.Controllers
         [ValidateAntiForgeryToken]
         public JsonResult Vote(int optionID, int pollID)
         {
-            if (!db.Vote.Where(x => x.Option.PollFK.Equals(pollID)).Where(x => x.User.UserName.Equals(User.Identity.Name)).Any())
+            if (User.IsInRole("partner") || (db.Poll.Find(pollID).IsInclusive && User.IsInRole("associated")))
             {
-                Vote vote = new Vote { OptionFK = optionID, UserFK = User.Identity.GetUserId() };
-                db.Vote.Add(vote);
-                db.SaveChanges();
-                Option option = db.Option.Find(optionID);
-                option.Count++;
-                db.Entry(option).State = EntityState.Modified;
-                db.SaveChanges();
-                Log(String.Format("Votou no questionário: {0}", db.Poll.Find(pollID).Matter));
-                return Json(new { result = true, msg = "Voto inserido com sucesso." });
+                if (!db.Vote.Where(x => x.Option.PollFK.Equals(pollID)).Where(x => x.User.UserName.Equals(User.Identity.Name)).Any())
+                {
+                    Vote vote = new Vote { OptionFK = optionID, UserFK = User.Identity.GetUserId() };
+                    db.Vote.Add(vote);
+                    db.SaveChanges();
+                    Option option = db.Option.Find(optionID);
+                    option.Count++;
+                    db.Entry(option).State = EntityState.Modified;
+                    db.SaveChanges();
+                    Log(String.Format("Votou no questionário: {0}", db.Poll.Find(pollID).Matter));
+                    return Json(new { result = true, msg = "Voto inserido com sucesso." });
+                }
+                else
+                {
+                    return Json(new { result = false, msg = "Já tinha votado anteriormente." });
+                }
             }
             else
             {
-                return Json(new { result = false, msg = "Já tinha votado anteriormente." });
+                return Json(new { result = false, msg = "Não autorizado." });
             }
+
         }
 
         // POST: Publications/Comment/
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "partner")]
         public JsonResult Comment(String text, int publicationID, String publicationName)
         {
             try
@@ -125,6 +135,7 @@ namespace Project.Controllers
         // POST: Publications/Censor/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "collaborator")]
         public JsonResult Censor(int replyID)
         {
             try
@@ -146,6 +157,7 @@ namespace Project.Controllers
         // POST: Publications/Censor/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "collaborator")]
         public JsonResult ClosePoll(int pollID)
         {
             try
@@ -168,6 +180,7 @@ namespace Project.Controllers
         // POST: Publications/Accept/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public ActionResult Accept(int publicationID)
         {
             Publication p = db.Publication.Find(publicationID);
@@ -179,6 +192,7 @@ namespace Project.Controllers
         }
 
         // GET: Publications/Create
+        [Authorize(Roles = "collaborator")]
         public ActionResult Create()
         {
             return View();
@@ -188,6 +202,7 @@ namespace Project.Controllers
         // POST: Publications/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "collaborator")]
         public ActionResult Create([Bind(Include = "Name,Description,IsEvent,IsPoll,Day,Local,Matter,IsVisible,IsInclusive,LinkToForm,OptionName")] PublicationCreateViewModel form, HttpPostedFileBase file)
         {
             if (ModelState.IsValid)
@@ -233,6 +248,7 @@ namespace Project.Controllers
         }
 
         // GET: Publications/Edit/5
+        [Authorize(Roles = "admin")]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -269,6 +285,7 @@ namespace Project.Controllers
         // POST: Publications/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public ActionResult Edit([Bind(Include = "ID,Name,Description,IsEvent,IsPoll,Day,Local,Matter,IsVisible,IsInclusive,LinkToForm,OptionName")] PublicationEditViewModel form, HttpPostedFileBase file)
         {
             if (ModelState.IsValid)

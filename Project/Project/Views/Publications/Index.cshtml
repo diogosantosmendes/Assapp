@@ -6,8 +6,16 @@
 
 <div class="container">
     <div class="pull-right" style="padding-top:3%;padding-bottom:2%;">
-        @Html.ActionLink("Pendentes", "Unaccepted", null, new { @class = "btn btn-default" })
-        @Html.ActionLink("Nova Publicação", "Create", null, new { @class = "btn btn-default" })
+        @* Apenas o admin pode aceitar publicações *@
+        @if (User.IsInRole("admin"))
+            {
+            @Html.ActionLink("Pendentes", "Unaccepted", null, new { @class = "btn btn-default" })
+        }
+        @* apenas os colaboradores podem criar novas publicações *@
+        @if (User.IsInRole("collaborator"))
+            {
+            @Html.ActionLink("Nova Publicação", "Create", null, new { @class = "btn btn-default" })
+        }
     </div>
 </div>
 
@@ -17,10 +25,10 @@
         <!-- Wrapper for slides -->
         <div class="carousel-inner">
             @for (var i = 0; i < 4; i++)
-            {
-
-                if (i == 0)
                 {
+
+                    if (i == 0)
+                    {
                     <div class="item active">
                         <a href="@Url.Action("Details", new { publicationID=Model.Header[i].ID})">
                             <img src="~/fonts/@Url.Content(Model.Header[i].Image)" style="height:600px;" class="img-responsive center-block" />
@@ -54,14 +62,14 @@
             <span class="sr-only">Next</span>
         </a>
     </div>
-    <hr />
+        <hr />
 }
 
 
 <div class="row">
     @*PUBLICATION LIST *@
     @foreach (var item in Model.List)
-            {
+    {
         <div class="col-sm-6 col-lg-4">
             <a href="@Url.Action("Details", new { publicationID=item.ID})">
                 <div id="panel@(item.ID)" class="panel panel-primary" style="position:relative; height:350px">
@@ -93,7 +101,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     @* Text *@
                     @if (item.Resume != null)
                     {
@@ -111,10 +119,10 @@
 <div class="row">
     <div class="col-xs-6 text-right">
         @if (Model.HaveLess)
-        { <a href="@Url.Action("Page", "Publications", new { i=Model.Index-1 })" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left" aria-label="Left Align" aria-hidden="true"></span></a> }
+            { <a href="@Url.Action("Page", "Publications", new { i=Model.Index-1 })" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left" aria-label="Left Align" aria-hidden="true"></span></a> }
     </div>
     <div class="col-xs-6">
         @if (Model.HaveMore)
-        { <a href="@Url.Action("Page", "Publications", new { i=Model.Index+1 })" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right" aria-label="Right Align" aria-hidden="true"></span></a> }
+            { <a href="@Url.Action("Page", "Publications", new { i=Model.Index+1 })" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right" aria-label="Right Align" aria-hidden="true"></span></a> }
     </div>
 </div>

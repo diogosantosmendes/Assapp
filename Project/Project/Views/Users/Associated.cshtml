@@ -5,12 +5,16 @@
     <div class="col-xs-12">
         <div class="row">
             <div class="col-xs-6"><h2>Utilizadores</h2></div>
-            <div class="col-xs-6 text-right" style="padding-top:3%;padding-bottom:2%;">
-                <a href="@Url.Action("Options", "Users")" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span> Opções</a>
-            </div>
+            @if (User.IsInRole("admin"))
+            {
+                <div class="col-xs-6 text-right" style="padding-top:3%;padding-bottom:2%;">
+                    <a href="@Url.Action("Options", "Users")" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span> Opções</a>
+                </div>
+            }
             <div class="col-xs-12"><hr /></div>
         </div>
     </div>
+    @* SIDEBAR *@
     <div class="col-xs-12 col-sm-6 col-md-4">
         <ul class="nav nav-pills nav-stacked">
             <li>@Html.ActionLink("Pendentes", "Pending", "Users", routeValues: null, htmlAttributes: new { @class = "btn btn-default" })</li>
@@ -20,7 +24,7 @@
         </ul>
         <hr />
         @* LIST *@
-        <div style="max-height:700px;overflow-y:scroll;">
+        <div style="max-height:700px;overflow-y:auto;">
             @foreach (var item in Model)
             {
                 <a data-toggle="collapse" href="@string.Format("#user{0}",item.Id)" data-parent="#panelParent">
@@ -39,51 +43,45 @@
                         <div class="col-xs-12 text-right">
                             <button type="button" class="btn btn-success" data-toggle="modal" data-target="@string.Format("#promote{0}",item.Id)">Tornar Sócio</button>
                         </div>
-
+                        @* name *@
                         <div class="col-sm-12 col-md-4 text-right">
                             <h5><small>@Html.DisplayNameFor(model => model.Name)</small></h5>
                         </div>
-
                         <div class="col-sm-12 col-md-8">
                             <h5>@Html.DisplayFor(model => item.Name)</h5>
                         </div>
-
-
+                        @* last date of due's payment *@
                         <div class="col-sm-12 col-md-4 text-right">
                             <h5><small>@Html.DisplayNameFor(model => model.DuePayday)</small></h5>
                         </div>
-
                         <div class="col-sm-12 col-md-8">
                             @if (item.DuePayday != null)
                             { <h5>@Html.DisplayFor(model => item.DuePayday)</h5>}
                             else
                             { <h5>Nunca</h5> }
                         </div>
-
+                        @* register's date *@
                         <div class="col-sm-12 col-md-4 text-right">
                             <h5><small>@Html.DisplayNameFor(model => model.RegisterDate)</small></h5>
                         </div>
-
                         <div class="col-sm-12 col-md-8">
                             <h5>@Html.DisplayFor(model => item.RegisterDate)</h5>
                         </div>
-
+                        @* email *@
                         <div class="col-sm-12 col-md-4 text-right">
                             <h5><small>@Html.DisplayNameFor(model => model.Email)</small></h5>
                         </div>
-
                         <div class="col-sm-12 col-md-8">
                             <h5>@Html.DisplayFor(model => item.Email)</h5>
                         </div>
-
+                        @* phone number *@
                         <div class="col-sm-12 col-md-4 text-right">
                             <h5><small>@Html.DisplayNameFor(model => model.PhoneNumber)</small></h5>
                         </div>
-
                         <div class="col-sm-12 col-md-8">
                             <h5>@Html.DisplayFor(model => item.PhoneNumber)</h5>
                         </div>
-
+                        @* log activity *@
                         <div class="col-xs-12"><hr /></div>
                         <div class="col-xs-12">
                             @Ajax.ActionLink("Actividade", "Log", new { userID = item.Id, page = 0 }, new AjaxOptions { HttpMethod = "Get", OnSuccess = "logSucess" }, new { @class = "btn btn-primary center-block h4" })

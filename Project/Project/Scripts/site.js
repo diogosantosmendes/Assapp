@@ -108,6 +108,12 @@ var loadFile = function (event) {
     output.src = URL.createObjectURL(event.target.files[0]);
 };
 
+var loadFile = function (event, id) {
+    var output = document.getElementById(id);
+    output.hidden = false;
+    output.src = URL.createObjectURL(event.target.files[0]);
+};
+
 function addOption() {
     if (optionID < 10) {
         var options = document.getElementById("options");
@@ -153,9 +159,13 @@ function logSucess(data) {
         }
         if (data.hasmore) {
             document.getElementById("right" + data.user).innerHTML = '<a data-ajax="true" data-ajax-method="Get" data-ajax-success="logSucess" href="/Users/Log?userID=' + data.user + '&page=' + (data.page + 1) + '" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right" aria-label="Right Align" aria-hidden="true"></span></a>';
+        } else {
+            document.getElementById("right" + data.user).innerHTML = '';
         }
         if (data.page!=0) {
             document.getElementById("left" + data.user).innerHTML = '<a data-ajax="true" data-ajax-method="Get" data-ajax-success="logSucess" href="/Users/Log?userID=' + data.user + '&page=' + (data.page - 1) + '" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left" aria-label="Right Align" aria-hidden="true"></span></a>';
+        } else {
+            document.getElementById("left" + data.user).innerHTML = '';
         }
     } else {
         msg = document.getElementById("errorText");

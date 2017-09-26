@@ -1,0 +1,140 @@
+﻿@model Project.Models.HomeIndexViewModel
+
+@using (Html.BeginForm("Edit", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-sm-8">
+            <h2>Editar Homepage</h2>
+        </div>
+        <div class="col-sm-4" style="padding-top:3%;padding-bottom:2%;">
+            <div class="pull-right">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 col-md-10">
+            <div class="container-fluid row">
+
+                @* Title *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                @* Image *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.Image, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @if (Model.Image != null)
+                            {
+                                <img class="img-thumbnail" style="max-height:400px;" id="imgPreview1" src="~/fonts/@Url.Content(Model.Image)" />
+                            }
+                            else
+                            {
+                                <img class="img-responsive" style="max-height:400px;" id="imgPreview1" src="" hidden />
+                            }
+                            @Html.TextBox("file1", "", new { type = "file", onchange = "loadFile(event, 'imgPreview1')", name="file1" })
+                            @Html.HiddenFor(model=>model.Image)
+                        </div>
+                    </div>
+                </div>
+
+                @* AboutUs *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.AboutUs, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextAreaFor(model => model.AboutUs, new { @class = "form-control", style = "height:200px" })
+                            @Html.ValidationMessageFor(model => model.AboutUs, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                @* Mission *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.Mission, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextAreaFor(model => model.Mission, new { @class = "form-control", style = "height:200px" })
+                            @Html.ValidationMessageFor(model => model.Mission, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                @* WhoWeAre *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.WhoWeAre, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextAreaFor(model => model.WhoWeAre, new { @class = "form-control", style = "height:200px" })
+                            @Html.ValidationMessageFor(model => model.WhoWeAre, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                @* Team *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.TeamPhoto, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @if (Model.Image != null)
+                            {
+                                <img class="img-thumbnail" style="max-height:400px;" id="imgPreview2" src="~/fonts/@Url.Content(Model.TeamPhoto)" />
+                            }
+                            else
+                            {
+                                <img class="img-responsive" style="max-height:400px;" id="imgPreview2" src="" hidden />
+                            }
+                            @Html.TextBox("file2", "", new { type = "file", onchange = "loadFile(event, 'imgPreview2')", name="file2" })
+                            @Html.HiddenFor(model => model.TeamPhoto)
+                        </div>
+                    </div>
+                </div>
+
+                @* Latitude *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.Location_Lat, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(model => model.Location_Lat, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Location_Lat, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                @* Longitude *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.Location_Lon, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(model => model.Location_Lon, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Location_Lon, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                @* Regulation *@
+                <div class="col-xs-12">
+                    <div class="row">
+                        @Html.LabelFor(model => model.Regulation, htmlAttributes: new { @class = "control-label col-md-3 text-right" })
+                        <div class="col-md-9">
+                            @Html.TextBox(Model.Regulation, "" ,new { type = "file", name = "file3" })
+                            @Html.HiddenFor(model => model.Regulation)
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}

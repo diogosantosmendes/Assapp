@@ -33,6 +33,7 @@ namespace Project.Controllers
         }
 
         // GET: Users/Options
+        [Authorize(Roles = "collaborator")]
         public ActionResult Options()
         {
             var usersRole = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db))
@@ -52,6 +53,7 @@ namespace Project.Controllers
         }
 
         // POST: Users/Renew
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult> Renew(int payPlan)
         {
             foreach (var userRole in new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db)).Roles.Single(x => x.Name.Equals("partner")).Users)
@@ -71,6 +73,7 @@ namespace Project.Controllers
         }
 
         // POST: Users/Finish
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult> Finish(String userID)
         {
 
@@ -105,6 +108,7 @@ namespace Project.Controllers
         }
 
         // GET: Users/Collaborator
+        [Authorize(Roles = "collaborator")]
         public ActionResult Collaborator()
         {
             var usersRole = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db))
@@ -124,6 +128,7 @@ namespace Project.Controllers
         }
 
         // GET: Users/Partner
+        [Authorize(Roles = "collaborator")]
         public ActionResult Partner()
         {
             var usersRole = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db))
@@ -145,6 +150,7 @@ namespace Project.Controllers
         }
 
         // GET: Users/Associated
+        [Authorize(Roles = "collaborator")]
         public ActionResult Associated()
         {
             var usersRole = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db))
@@ -166,6 +172,7 @@ namespace Project.Controllers
         }
 
         // GET: Users/Pending
+        [Authorize(Roles = "collaborator")]
         public ActionResult Pending()
         {
             var usersRole = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db))
@@ -185,6 +192,7 @@ namespace Project.Controllers
         // POST: Users/Users/PromoteToStaff
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult> PromoteToStaff(String userID, String role)
         {
             var add = await UserManager.AddToRoleAsync(userID, "collaborator");
@@ -204,6 +212,7 @@ namespace Project.Controllers
         // POST: Users/Users/Demote
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult> Demote(String userID)
         {
             if (!UserManager.GetRoles(userID).Contains("admin"))
@@ -221,6 +230,7 @@ namespace Project.Controllers
         // POST: Users/Users/PromoteToPartner
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "collaborator")]
         public async Task<ActionResult> PromoteToPartner(int payPlan, int partner, String userID)
         {
             var user = UserManager.FindById(userID);
@@ -245,6 +255,7 @@ namespace Project.Controllers
         // POST: Users/PromoteToAssociated
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "collaborator")]
         public async Task<ActionResult> PromoteToAssociated(String userID)
         {
             var add = await UserManager.AddToRoleAsync(userID, "associated");
@@ -261,6 +272,7 @@ namespace Project.Controllers
 
         // GET: Users/Log
         [HttpGet]
+        [Authorize(Roles = "collaborator")]
         public JsonResult Log(string userID, int page)
         {
             try
@@ -271,7 +283,7 @@ namespace Project.Controllers
                     .Skip(page * 20)
                     .Take(20)
                     .Select(x=>new { Hour=x.Hour.ToString(), x.Description });
-                var hasmore = logs.Count() > (page * 20 + 20) ? true : false;
+                var hasmore = Math.Floor((decimal) logs.Count()/20) >  page ? true : false;
                 if (toSend.Count() > 0)
                 {
                     return Json(new { result = true, logs = toSend, page = page, hasmore = hasmore, user = userID }, JsonRequestBehavior.AllowGet);

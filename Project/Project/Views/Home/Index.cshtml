@@ -3,10 +3,12 @@
 @{
     ViewBag.Title = "Home Page";
 }
-
-<div class="text-right">
-    <a href="@Url.Action("Options", "Users")" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span> Editar</a>
-</div>
+@if (User.IsInRole("admin"))
+{
+    <div class="text-right">
+        <a href="@Url.Action("Edit", "Home")" class="btn btn-default"><span class="glyphicon glyphicon-cog"></span> Editar</a>
+    </div>
+}
 <br />
 
 <div style="width:100%"><img src="~/fonts/@Url.Content(Model.Image)" class="img-responsive" /></div>

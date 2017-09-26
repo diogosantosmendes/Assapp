@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Project.Models;
+using System.Data.Entity;
 
 namespace Project.Controllers
 {
@@ -50,26 +51,32 @@ namespace Project.Controllers
             }
         }
 
-        //
-        // GET: /Manage/Index
-        public async Task<ActionResult> Index(ManageMessageId? message)
-        {
-            ViewBag.StatusMessage =
-                message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
-                : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
-                : message == ManageMessageId.Error ? "An error has occurred."
-                : "";
 
-            var userId = User.Identity.GetUserId();
-            var model = new IndexViewModel
+        //
+        // GET: /Manage/EditAccount
+        public ActionResult EditAccount()
+        {
+            var user = UserManager.FindById(User.Identity.GetUserId());
+            if (user == null)
             {
-                HasPassword = HasPassword(),
-                PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
-                TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
-                Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
-            };
-            return View(model);
+                return HttpNotFound();
+            }
+            return View(user);
+        }
+
+        //
+        // POST: /Manage/EditAccount
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditAccount(User user)
+        {
+            if (user != null)
+            {
+                ApplicationDbContext db = new ApplicationDbContext();
+                db.Entry(user).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+            return View(user);
         }
 
         //
