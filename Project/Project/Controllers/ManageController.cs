@@ -52,8 +52,13 @@ namespace Project.Controllers
         }
 
 
-        //
         // GET: /Manage/EditAccount
+        /// <summary>
+        /// 
+        /// procura os dados do utilizador autenticado e apresenta para editar
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public ActionResult EditAccount()
         {
             var user = UserManager.FindById(User.Identity.GetUserId());
@@ -64,8 +69,14 @@ namespace Project.Controllers
             return View(user);
         }
 
-        //
         // POST: /Manage/EditAccount
+        /// <summary>
+        /// 
+        /// Edita os dados do utilizador
+        /// 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult EditAccount(User user)
@@ -79,14 +90,12 @@ namespace Project.Controllers
             return View(user);
         }
 
-        //
         // GET: /Manage/ChangePassword
         public ActionResult ChangePassword()
         {
             return View();
         }
 
-        //
         // POST: /Manage/ChangePassword
         [HttpPost]
         [ValidateAntiForgeryToken]

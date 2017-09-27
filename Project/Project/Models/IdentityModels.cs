@@ -43,6 +43,7 @@ namespace Project.Models
         [Display(Name = "Data de registo")]
         [DisplayFormat(DataFormatString = "{0:d MMM yyyy}")]
         public DateTime RegisterDate { get; set; }
+        
 
         [Display(Name = "Numero de telemóvel")]
         public override String PhoneNumber { get; set; }

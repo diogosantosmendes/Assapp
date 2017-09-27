@@ -12,97 +12,105 @@
 </div>
 
 <div class="panel-group" id="panelParent">
-    @foreach (var item in Model)
+    @if (Model.Count() > 0)
     {
-        <div class="panel panel-default">
-            @* HEADER *@
-            <div class="panel-heading">
-                <a data-toggle="collapse" data-parent="#panelParent" href="@string.Format("#publication{0}",item.ID)">
-                    <div class="row">
-                        @* Creation Date *@
-                        <div class="col-xs-8 col-sm-2"><h5><span class="label label-default">@Html.DisplayFor(modelItem => item.CreatedIn)</span></h5></div>
-                        @* Type *@
-                        <div class="col-xs-4 col-sm-1">
-                            @if (item.EventFK != null)
-                            {   <label class="h5 text-success"><span class="glyphicon glyphicon-globe"></span></label> }
-                            @if (item.PollFK != null)
-                            {   <label class="h5 text-primary"><span class="glyphicon glyphicon-list"></span></label> }
+        foreach (var item in Model)
+        {
+            <div class="panel panel-default">
+                @* HEADER *@
+                <div class="panel-heading">
+                    <a data-toggle="collapse" data-parent="#panelParent" href="@string.Format("#publication{0}",item.ID)">
+                        <div class="row">
+                            @* Creation Date *@
+                            <div class="col-xs-8 col-sm-2"><h5><span class="label label-default">@Html.DisplayFor(modelItem => item.CreatedIn)</span></h5></div>
+                            @* Type *@
+                            <div class="col-xs-4 col-sm-1">
+                                @if (item.EventFK != null)
+                                {   <label class="h5 text-success"><span class="glyphicon glyphicon-globe"></span></label> }
+                                @if (item.PollFK != null)
+                                {   <label class="h5 text-primary"><span class="glyphicon glyphicon-list"></span></label> }
+                            </div>
+                            @* Title *@
+                            <div class="col-xs-12 col-sm-9"><h4>@Html.DisplayFor(modelItem => item.Name)</h4></div>
                         </div>
-                        @* Title *@
-                        <div class="col-xs-12 col-sm-9"><h4>@Html.DisplayFor(modelItem => item.Name)</h4></div>
-                    </div>
-                </a>
-            </div>
-            @* PROFILE *@
-            <div id="@string.Format("publication{0}",item.ID)" class="panel-collapse collapse container-fluid">
-                <div class="panel-body">
-                    <div class="row">
-                        @* Image *@
-                        <div class="col-xs-12 col-sm-8 col-md-9 text-right">
-                            @if (item.Image != null)
-                            {<img src="~/fonts/@Url.Content(item.Image)" class="img-thumbnail" style="max-height:400px;" /> }
-                        </div>
-                        @* Accept *@
-                        <div class="col-xs-8 col-sm-2 col-md-2 text-right">
-                            @using (Html.BeginForm("Accept", "Publications", FormMethod.Post))
+                    </a>
+                </div>
+                @* PROFILE *@
+                <div id="@string.Format("publication{0}",item.ID)" class="panel-collapse collapse container-fluid">
+                    <div class="panel-body">
+                        <div class="row">
+                            @* Image *@
+                            <div class="col-xs-12 col-sm-8 col-md-9 text-right">
+                                @if (item.Image != null)
+                                {<img src="~/fonts/@Url.Content(item.Image)" class="img-thumbnail" style="max-height:400px;" /> }
+                            </div>
+                            @* Accept *@
+                            <div class="col-xs-8 col-sm-2 col-md-2 text-right">
+                                @using (Html.BeginForm("Accept", "Publications", FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.Hidden(name: "PublicationID", value: item.ID)
+                                    <input type="submit" value="Aceitar" class="btn btn-primary" />
+                                }
+                            </div>
+                            @* Edit *@
+                            <div class="col-xs-4 col-sm-2 col-md-1 text-right">@Html.ActionLink("Editar", "Edit", routeValues: new { id = item.ID }, htmlAttributes: new { @class = "btn btn-default" }) </div>
+                            @* Event *@
+                            @if (item.Event != null)
                             {
-                                @Html.AntiForgeryToken()
-                                @Html.Hidden(name: "PublicationID", value: item.ID)
-                                <input type="submit" value="Aceitar" class="btn btn-primary" />
+                                @* Day *@
+                                <div class="col-xs-12 col-sm-6 text-center">
+                                    <label class="h4 text-success"><span class="glyphicon glyphicon-time"></span> @Html.DisplayFor(model => item.Event.Day)</label>
+                                </div>
+                                @* Local *@
+                                <div class="col-xs-12 col-sm-6 text-center">
+                                    <label class="h4 text-success"><span class="glyphicon glyphicon-map-marker"></span> @Html.DisplayFor(model => item.Event.Local)</label>
+                                </div>
                             }
-                        </div>
-                        @* Edit *@
-                        <div class="col-xs-4 col-sm-2 col-md-1 text-right">@Html.ActionLink("Editar", "Edit", routeValues: new { id = item.ID }, htmlAttributes: new { @class = "btn btn-default" }) </div>
-                        @* Event *@
-                        @if (item.Event != null)
-                        {
-                            @* Day *@
-                            <div class="col-xs-12 col-sm-6 text-center">
-                                <label class="h4 text-success"><span class="glyphicon glyphicon-time"></span> @Html.DisplayFor(model => item.Event.Day)</label>
-                            </div>
-                            @* Local *@
-                            <div class="col-xs-12 col-sm-6 text-center">
-                                <label class="h4 text-success"><span class="glyphicon glyphicon-map-marker"></span> @Html.DisplayFor(model => item.Event.Local)</label>
-                            </div>
-                        }
-                        @* Poll *@
-                        <!-- ///////////////////// falta role //////////////////////////// -->
-                        @if (item.Poll != null)
-                        {
-                            <div class="col-xs-12">
-                                @* Matter *@
-                                <div class="text-center">
-                                    <label class="h4 text-primary"><span class="glyphicon glyphicon-list"></span> @Html.DisplayFor(model => item.Poll.Matter)</label>
-                                </div>
-                                @* Link to external form *@
-                                <div class="text-center">
-                                    @if (item.Poll.LinkToForm != null)
-                                    {
-                                        <span class="glyphicon glyphicon-arrow-right"></span><label class="h5"><a href="@item.Poll.LinkToForm" target="_blank">Form</a></label>
-                                    }
-                                </div>
-                                @* Vote *@
-                                <div class="row text-center">
-                                    <div class="col-xs-12 col-md-6 col-lg-4 text-right" style="padding-top:20px;">
-                                        @foreach (var choice in item.Poll.Options)
-                                        {
-                                            @Html.DisplayFor(mode => choice.Name)
-                                            <label> - </label>
-                                            @Html.RadioButton("OptionID", choice.ID)
-                                            <br />
-                                        }
-                                        <button class="btn btn-default" disabled>Votar</button>
+                            @* Poll *@
+                            <!-- ///////////////////// falta role //////////////////////////// -->
+                            @if (item.Poll != null)
+                            {
+                                <div class="col-xs-12">
+                                    @* Matter *@
+                                    <div class="text-center">
+                                        <label class="h4 text-primary"><span class="glyphicon glyphicon-list"></span> @Html.DisplayFor(model => item.Poll.Matter)</label>
                                     </div>
-                                    <div class="col-lg-2"></div>
+                                    @* Link to external form *@
+                                    <div class="text-center">
+                                        @if (item.Poll.LinkToForm != null)
+                                        {
+                                            <span class="glyphicon glyphicon-arrow-right"></span><label class="h5"><a href="@item.Poll.LinkToForm" target="_blank">Form</a></label>
+                                        }
+                                    </div>
+                                    @* Vote *@
+                                    <div class="row text-center">
+                                        <div class="col-xs-12 col-md-6 col-lg-4 text-right" style="padding-top:20px;">
+                                            @foreach (var choice in item.Poll.Options)
+                                            {
+                                                @Html.DisplayFor(mode => choice.Name)
+                                                <label> - </label>
+                                                @Html.RadioButton("OptionID", choice.ID)
+                                                <br />
+                                            }
+                                            <button class="btn btn-default" disabled>Votar</button>
+                                        </div>
+                                        <div class="col-lg-2"></div>
+                                    </div>
                                 </div>
-                            </div>
-                        }
-                        <hr />
-                        @* Description *@
-                        <div class="col-xs-12"><h5>@Html.DisplayFor(model => item.Description)</h5></div>
+                            }
+                            <hr />
+                            @* Description *@
+                            <div class="col-xs-12"><h5>@Html.DisplayFor(model => item.Description)</h5></div>
+                        </div>
                     </div>
+                </div>
             </div>
-        </div>
-    </div>
+        }
+
     }
-</div>
+    else
+    {
+        <h4 class="text-danger">Não existem publicações pendentes</h4>
+    }
+</div> 

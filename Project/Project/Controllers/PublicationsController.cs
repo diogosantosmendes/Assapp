@@ -19,16 +19,27 @@ namespace Project.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Publications
+        /// <summary>
+        /// 
+        /// Apresenta a lista de publicações, mas como é a primeira chamada tem um view diferente
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Index()
         {
             try
             {
                 PublicationListViewModel list = new PublicationListViewModel
                 {
+                    // como a view não é paginada apresenta a página a -1
                     Index = -1,
+                    // como apresenta apeenas 6 publicações  verifica se o total é superior a isso
                     HaveMore = db.Publication.Count() > 6 ? true : false,
-                    HaveLess = false,
-                    List = db.Publication.Where(x => x.Accepted).OrderByDescending(p => p.CreatedIn).Take(6).ToList(),
+                    // como é a primeira vista da listagem de publicações, não tem uma página inferior
+                    HaveLess = false, 
+                    // procura as ultimas 6 publicações aceites
+                    List = db.Publication.Where(x => x.Accepted).OrderByDescending(p => p.CreatedIn).Take(6).ToList(), 
+                    // procura as ultimas 4 publicações com imagem para apresentar no caroussel
                     Header = db.Publication.Where(x => x.Accepted && x.Image != null).OrderByDescending(p => p.CreatedIn).Take(4).ToList()
                 };
                 return View(list);
@@ -41,15 +52,26 @@ namespace Project.Controllers
         }
 
         // GET: Publications
+        /// <summary>
+        /// 
+        /// Apresenta a lista de publicações paginadas
+        /// 
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
         public ActionResult Page(int i)
         {
             try
             {
+                // se o indice da página for -1 redireciona para o controller correspondente à primeira vista da listagem de publicações
                 if (i == -1) return RedirectToAction("Index");
+                // a flag servirá de auxiliar, como ponteiro ao indice das publicações a retornar
+                // como esta view é dedicada apenas a listagem de publicações, já serão retornadas 9 de cada vez
                 int flag = i * 9 + 6;
                 PublicationListViewModel list = new PublicationListViewModel
                 {
                     Index = i,
+                    // se a contagem for superior ao indice desta pagina na lista de publicações mais 9 então haverá mais publicações
                     HaveMore = db.Publication.Count() > (flag + 9) ? true : false,
                     HaveLess = true,
                     List = db.Publication.Where(x => x.Accepted).OrderByDescending(p => p.CreatedIn).Skip(flag).Take(flag + 9).ToList(),
@@ -65,15 +87,40 @@ namespace Project.Controllers
         }
 
         // GET: Publications/Profile
+        /// <summary>
+        /// 
+        /// Procura pela publicação pretendida e envia, caso não exista retorna à pagina inicial 
+        /// 
+        /// </summary>
+        /// <param name="publicationID"></param>
+        /// <returns></returns>
         public ActionResult Details(int? publicationID)
         {
             int index = publicationID ?? default(int);
-            return View(db.Publication.Find(index));
+            // se o id da publicação for inválido informa o bad request
+            if (index >= 0)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var model = db.Publication.Find(index);
+            // se a publicação não existir ou, se for um publicação por aceitar e o utilizador não é um admin,
+            // redireciona para a primeira vista da listagem de publicações
+            if (model == null || (!User.IsInRole("admin") && !model.Accepted))
+            {
+                return RedirectToAction("Index");
+            }
+            return View(model);
         }
 
 
 
         // GET: Publications/Unaccepted
+        /// <summary>
+        /// 
+        /// Procura pelas publicações por aceitar e apresenta
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [Authorize(Roles = "admin")]
         public ActionResult Unaccepted()
         {
@@ -81,21 +128,34 @@ namespace Project.Controllers
         }
 
         // POST: Publications/Vote/
+        /// <summary>
+        /// 
+        /// Executa o voto numa votação
+        /// 
+        /// </summary>
+        /// <param name="optionID"></param>
+        /// <param name="pollID"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public JsonResult Vote(int optionID, int pollID)
         {
+            // Apenas os sócios, ou em caso de votações autorizadas também os associados, podem votar
             if (User.IsInRole("partner") || (db.Poll.Find(pollID).IsInclusive && User.IsInRole("associated")))
             {
+                // verifica se existe a relações entre a opção de voto e a votação
                 if (!db.Vote.Where(x => x.Option.PollFK.Equals(pollID)).Where(x => x.User.UserName.Equals(User.Identity.Name)).Any())
                 {
+                    // guarda o voto
                     Vote vote = new Vote { OptionFK = optionID, UserFK = User.Identity.GetUserId() };
                     db.Vote.Add(vote);
                     db.SaveChanges();
+                    // incrementa o atributo da cotagem de votos na opção para estatisticas
                     Option option = db.Option.Find(optionID);
                     option.Count++;
                     db.Entry(option).State = EntityState.Modified;
                     db.SaveChanges();
+                    // regista a ação do utilizador
                     Log(String.Format("Votou no questionário: {0}", db.Poll.Find(pollID).Matter));
                     return Json(new { result = true, msg = "Voto inserido com sucesso." });
                 }
@@ -112,6 +172,15 @@ namespace Project.Controllers
         }
 
         // POST: Publications/Comment/
+        /// <summary>
+        /// 
+        /// Comenta numa publicação
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="publicationID"></param>
+        /// <param name="publicationName"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "partner")]
@@ -119,9 +188,11 @@ namespace Project.Controllers
         {
             try
             {
+                // guarda o comentário
                 Reply reply = new Reply { Content = text, Hour = DateTime.Now, IsVisible = true, PublicationFK = publicationID, UserFK = User.Identity.GetUserId() };
                 db.Reply.Add(reply);
                 db.SaveChanges();
+                // guarda a ação  do utilizador
                 Log(String.Format("Comentou ( {0} ) na publicação: {1}", text, publicationName));
                 return Json(new { result = true, publication = publicationID, hour = reply.Hour.ToString("dd MMM yyyy - hh:mm"), user = db.Users.Find(User.Identity.GetUserId()).Name.ToString() });
             }
@@ -133,6 +204,13 @@ namespace Project.Controllers
         }
 
         // POST: Publications/Censor/5
+        /// <summary>
+        /// 
+        /// Censura ou retira a censura de um comentário
+        /// 
+        /// </summary>
+        /// <param name="replyID"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "collaborator")]
@@ -140,10 +218,13 @@ namespace Project.Controllers
         {
             try
             {
+                // procura o comentário
                 Reply r = db.Reply.Find(replyID);
+                // se estiver visível coloca a invisivel e vice-versa
                 r.IsVisible = r.IsVisible == true ? false : true;
                 db.Entry(r).State = EntityState.Modified;
                 db.SaveChanges();
+                // regista a ação do utilizador
                 Log(String.Format("Censurou o comentário ( {0} ) de {1} na publicação: {2}", r.Content, r.User.Name, r.Publication.Name));
                 return Json(new { result = true, msg = "A censura foi realizada com sucesso. Atualize a página se pretender retroceder." });
             }
@@ -155,6 +236,13 @@ namespace Project.Controllers
         }
 
         // POST: Publications/Censor/5
+        /// <summary>
+        /// 
+        /// Encerra a votação
+        /// 
+        /// </summary>
+        /// <param name="pollID"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "collaborator")]
@@ -163,10 +251,13 @@ namespace Project.Controllers
             try
             {
                 Poll p = db.Poll.Find(pollID);
+                // termina a votação
                 p.IsFinished = true;
-                p.IsVisible = true;
+                // torna os resultados visiveis
+                p.IsVisible = true; 
                 db.Entry(p).State = EntityState.Modified;
                 db.SaveChanges();
+                // regista a ação do utilizador
                 Log(String.Format("Encerrou a votação: {0}", p.Matter));
                 return Json(new { result = true, msg = "A votação foi finalizada com sucesso. Atualize a página para consultar os resultados." });
             }
@@ -178,6 +269,13 @@ namespace Project.Controllers
         }
 
         // POST: Publications/Accept/5
+        /// <summary>
+        /// 
+        /// Aceita um publicação, de forma a ficar disponivel a todos os utilizadores
+        /// 
+        /// </summary>
+        /// <param name="publicationID"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin")]
@@ -200,6 +298,14 @@ namespace Project.Controllers
 
 
         // POST: Publications/Create
+        /// <summary>
+        /// 
+        /// Cria uma nova publicação
+        /// 
+        /// </summary>
+        /// <param name="form"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "collaborator")]
@@ -207,21 +313,26 @@ namespace Project.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Cria a publicação
                 Publication publication = new Publication { CreatedIn = DateTime.Now, Description = form.Description, Name = form.Name, Accepted = false, UserFK = User.Identity.GetUserId() };
 
+                // verifica se no formulário foi solicitado um evento
                 if (form.IsEvent)
                 {
+                    // cria o evento
                     Event e = new Event { Day = Convert.ToDateTime(form.Day), Local = form.Local };
                     db.Event.Add(e);
                     db.SaveChanges();
                     publication.Event = e;
                 }
-
+                // verifica se no formulário foi solicitada uma votação
                 if (form.IsPoll)
                 {
+                    // cria a votação
                     Poll p = new Poll { Matter = form.Matter, IsFinished = false, IsInclusive = form.IsInclusive, IsVisible = form.IsVisible, LinkToForm = form.LinkToForm };
                     db.Poll.Add(p);
                     db.SaveChanges();
+                    // Cria as opções de escolha da votação
                     foreach (String option in form.OptionName)
                     {
                         Option o = new Option { Name = option, Poll = p, Count = 0 };
@@ -230,9 +341,10 @@ namespace Project.Controllers
                     }
                     publication.Poll = p;
                 }
-
+                // verifica se foi enviadoo algum ficheiro
                 if (file != null && file.ContentLength > 0)
                 {
+                    // guarda o ficheiro e guarda o nome do mesmo no atributo de imagem da publicação
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     var path = Path.Combine(Server.MapPath("~/fonts"), fileName);
                     file.SaveAs(path);
@@ -241,6 +353,7 @@ namespace Project.Controllers
 
                 db.Publication.Add(publication);
                 db.SaveChanges();
+                // regista a ação do utilizador
                 Log(String.Format("Criou uma nova publicação: {0}", publication.Name));
                 return RedirectToAction("Index");
             }
@@ -261,7 +374,7 @@ namespace Project.Controllers
             {
                 return HttpNotFound();
             }
-
+            // Cria o objeto da View para o formulário
             PublicationEditViewModel viewModel = new PublicationEditViewModel
             {
                 ID = publication.ID,
@@ -283,6 +396,14 @@ namespace Project.Controllers
         }
 
         // POST: Publications/Edit/5
+        /// <summary>
+        /// 
+        /// Edita uma publicação
+        /// 
+        /// </summary>
+        /// <param name="form"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin")]
@@ -290,21 +411,24 @@ namespace Project.Controllers
         {
             if (ModelState.IsValid)
             {
-
+                // procura na base de dados a publicação a alterar
                 Publication publication = db.Publication.Find(form.ID);
                 publication.Name = form.Name;
                 publication.Description = form.Description;
-
+                // verifica se a publicação originalmente tinha associado um evento
                 if (publication.EventFK != null)
                 {
+                    // verifica se o formulário está editado como um evento
                     if (form.IsEvent)
                     {
+                        // porcura o evento a alterar e altera
                         Event e = db.Event.Find(publication.EventFK);
                         e.Local = form.Local;
                         e.Day = Convert.ToDateTime(form.Day);
                         db.Entry(e).State = EntityState.Modified;
                         db.SaveChanges();
                     }
+                    // senão coloca a null a referencia ao evento
                     else
                     {
                         publication.EventFK = null;
@@ -312,6 +436,7 @@ namespace Project.Controllers
                 }
                 else
                 {
+                    // se originalmente não existia um evento associado, e foi editado com um evento então este é criado
                     if (form.IsEvent)
                     {
                         Event e = new Event { Local = form.Local, Day = Convert.ToDateTime(form.Day) };
@@ -320,11 +445,13 @@ namespace Project.Controllers
                         publication.Event = e;
                     }
                 }
-
+                // verifica se a publicação originalmente tinha associada uma votação
                 if (publication.PollFK != null)
                 {
+                    // Verifica se o formulário foi definido com uma votação 
                     if (form.IsPoll)
                     {
+                        // procura pela votação a editar
                         Poll p = db.Poll.Find(publication.PollFK);
                         p.LinkToForm = form.LinkToForm;
                         p.IsInclusive = form.IsInclusive;
@@ -332,6 +459,7 @@ namespace Project.Controllers
                         db.Entry(p).State = EntityState.Modified;
                         db.SaveChanges();
                     }
+                    // senão coloca a referencia da votação na publicação a null 
                     else
                     {
                         publication.PollFK = null;
@@ -339,12 +467,14 @@ namespace Project.Controllers
                 }
                 else
                 {
+                    // se a publicação originalmente não tinha associada uma votação, verific se o formu´lário já tem
                     if (form.IsPoll)
                     {
+                        // cria uma nova publicação
                         Poll p = new Poll { LinkToForm = form.LinkToForm, IsInclusive = form.IsInclusive, IsVisible = form.IsVisible, Matter = form.Matter, IsFinished = false };
                         db.Poll.Add(p);
                         db.SaveChanges();
-
+                        // crias as opções de escolha á votação
                         foreach (String option in form.OptionName)
                         {
                             Option o = new Option { Name = option, Poll = p, Count = 0 };
@@ -355,9 +485,10 @@ namespace Project.Controllers
                     }
                 }
 
-
+                // verifica se foi enviado um ficheiro
                 if (file != null && file.ContentLength > 0)
                 {
+                    // guarda o ficheiro e altera o nome da imagem  na publicação
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     var path = Path.Combine(Server.MapPath("~/fonts"), fileName);
                     file.SaveAs(path);
@@ -366,7 +497,7 @@ namespace Project.Controllers
 
                 db.Entry(publication).State = EntityState.Modified;
                 db.SaveChanges();
-
+                // regista a ação do utilizador
                 Log(String.Format("Editou a publicação: {0}", publication.Name));
                 return RedirectToAction("Index");
             }

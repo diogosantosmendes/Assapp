@@ -20,6 +20,7 @@ namespace Project.Migrations
 
         protected override async void Seed(ApplicationDbContext context)
         {
+            /*
             // Verifies if the database is empty, if yes then proceed to the seed
             if (!context.Users.Any())
             {
@@ -239,6 +240,7 @@ namespace Project.Migrations
                 logs.ForEach(log => context.Log.AddOrUpdate(l => l.ID, log));
                 context.SaveChanges();
             }
+            */
         }
     }
 }
